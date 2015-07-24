@@ -5,28 +5,33 @@ Readme_jp.txt
 スタンダードソフトウェア
 2015/07/24
 --------------------------------------------------
-standard-software/st_vbs
-https://github.com/standard-software/st_vbs
+standard-software/ExcelMakeAppFramework
+https://github.com/standard-software/ExcelMakeAppFramework
 --------------------------------------------------
 
 ■概要 
 このプログラムソースコードライブラリの名称は
-[st_vbs]です。
+[Excel MakeApp Framework]です。
 
-Windows PC で動作する WSH VBScript での実用的な関数ライブラリです。
+Windows PC で動作する Excel VBA で
+アプリケーションを作成するためのフレームワークです。
 
-VBScript は Bat ファイルに代わる高機能なプログラミング言語です。
-テキストエディタがあれば、
-Windows PC 上で簡単にプログラムを作成できるために
+Excel VBA は Microsoft Excel に含まれる強力なプログラミング言語です。
+Excel 上で簡単にプログラムを作成できるために
 非常に利用者が多い言語だと思われます。
 
-手軽でありかつ高機能な言語ですので、開発効率は高いです。
+Excel自体が非常によく使われているアプリケーションなのと
+Excel VBA はシンプルでありながら
+高機能な言語ですので、開発効率は高いです。
 
-しかし、標準的に備えて欲しい機能なのに
-欠けている部分も感じたりします。
+しかし、Excel上で動作するので、
+一般的なアプリケーションを作成できません。
 
-そこで VBScript での開発をさらに効率のよいものにするために
-VBScript の標準にはないが汎用的に使える機能を関数としてまとめて
+そこで Excel VBA での開発でも一般的なアプリケーションに見えるように
+FormやExcelシートをウィンドウとして動作するようにしたものが
+
+Excel MakeApp Framework です。
+
 オープンソースのライブラリとして
 スタンダードソフトウェアのライブラリとして公開させていただきます。
 
@@ -38,37 +43,48 @@ VBScript の標準にはないが汎用的に使える機能を関数としてまとめて
 より多くの開発者の方に提供させていただくために
 MIT ライセンスとします。
 
+
 ■使用方法
 
-VBScriptファイル test.vbs を作成するとします。
+プロジェクトをダウンロードして展開すると下記の
+ファイル構成になっています。
 
-Sub Include と Call Include を使用して下記のように記載ください。
+    ExcelMakeAppFramework
+        version.txt --- バージョン記載ファイル
+        Document
+            Readme_jp.txt --- この説明ファイル
+        Source
+            Project01 --- プロジェクトフォルダ
+                Project01.ini --- アプリケーション設定Iniファイル
+                Project01.vbs --- アプリケーション起動ファイル
+                program 
+                    tool
+                        Win7AppId.exe_ --- タスクバー登録用実行ファイル
+                    FormMainIcon.ico --- アプリケーションアイコンファイル
+                    Project01.xls --- アプリケーション本体Excelファイル
 
-test.vbs
+            Project02 --- プロジェクトフォルダ
+                Project01と構成同じ
 
-    Option Explicit
+            Project03
+                Project01と構成同じ
 
-    '--------------------------------------------------
-    '■Include Standard Software Library
-    '--------------------------------------------------
-    Sub Include(ByVal FileName)
-        Dim fso: Set fso = WScript.CreateObject("Scripting.FileSystemObject") 
-        Dim Stream: Set Stream = fso.OpenTextFile( _
-            fso.GetParentFolderName(WScript.ScriptFullName) _
-            + "\" + FileName, 1)
-        Call ExecuteGlobal(Stream.ReadAll())
-        Call Stream.Close
-    End Sub
-    '--------------------------------------------------
-    Call Include(".\st.vbs")
-    '--------------------------------------------------
 
-test.vbsファイルと同一フォルダに
-st.vbs を配置していただくことで
-test.vbsファイルにst.vbsが組み込まれます。
+Win7AppId.exe_ は 拡張子を .exe_ から .exe に変更してください。
 
-あとは、test.vbsファイルの Call Include の行の下に
-st.vbsを使用してVBScriptを記述していくことができます。
+Win7AppId.exe は、次のサイトのものを使わせていただいています。
+
+win7appid - Windows 7 Shortcut Application Id Tool - Google Project Hosting
+https://code.google.com/p/win7appid/
+
+タスクバー登録時にどうしても Excel VBA だけで行えないコマンド的な処理があり
+そこをこのプログラムで補っています。
+
+Project01.vbs
+Project02.vbs
+Project03.vbs
+
+を起動すると、3タイプのアプリケーションが起動します。
 
 
 ■導入支援など
@@ -92,7 +108,9 @@ MIT ライセンスです。
 
 このライブラリを使用して
 ご自身の作成したプログラムを他の人に配付する際には
-st_vbs を利用していることを記載してください。
+Excel MakeApp Framework を利用していることを記載してください。
+また、Excel MakeApp Framework は st_vba ライブラリも使用しているので
+そちらも記載ください。
 
 
 ■免責事項
