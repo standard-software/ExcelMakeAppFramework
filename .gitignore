@@ -215,6 +215,8 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
+
+
 #################
 ## User
 #################
@@ -222,6 +224,7 @@ pip-log.txt
 Backup
 icon
 appumid
+win7appid
 開発メモ.txt
 
 
