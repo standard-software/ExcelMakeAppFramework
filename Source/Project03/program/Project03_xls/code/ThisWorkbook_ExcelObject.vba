@@ -1,8 +1,10 @@
 '--------------------------------------------------
-'Excel Make App Framework
-'Project03 ThisWorkbook
-'
+'Excel MakeApp Framework
+'--------------------------------------------------
+'ModuleName:    Project03 ThisWorkbook
 'ObjectName:    ThisWorkbook
+'--------------------------------------------------
+'Version:       2015/07/29
 '--------------------------------------------------
 Option Explicit
 

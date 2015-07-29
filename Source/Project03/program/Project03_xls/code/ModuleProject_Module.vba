@@ -1,10 +1,10 @@
 '--------------------------------------------------
-'Excel Make App Framework
-'Project Module
-'
+'Excel MakeApp Framework
+'--------------------------------------------------
+'ModuleName:    Project Module
 'ObjectName:    ModuleProject
 '--------------------------------------------------
-'バージョン     2014/12/06
+'Version:       2015/07/29
 '--------------------------------------------------
 Option Explicit
 
@@ -51,7 +51,6 @@ Public Const Project_VersionDialogInstruction As String = _
     "バージョン情報"
     
 Public Const Project_VersionDialogContent As String = _
-    "Excel Make App Framework" + vbCrLf + _
     Project_Name + vbCrLf + _
     "Version " + Project_VersionNumberText
 

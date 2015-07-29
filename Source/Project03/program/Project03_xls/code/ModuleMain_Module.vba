@@ -1,10 +1,10 @@
 '--------------------------------------------------
-'Excel Make App Framework
-'Main Module
-'
+'Excel MakeApp Framework
+'--------------------------------------------------
+'ModuleName:    Main Module
 'ObjectName:    ModuleMain
 '--------------------------------------------------
-'バージョン     2014/12/06
+'Version:       2015/07/29
 '--------------------------------------------------
 Option Explicit
 
@@ -29,6 +29,10 @@ On Error GoTo Err:
     ThisWorkbook.OriginalWindowRectBuffer = _
          RectToStr(Form_GetRectPixel(Application))
 
+    Dim WorkAreaRect As Rect
+    WorkAreaRect = GetRectWorkArea
+    Application.Width = GetRectWidth(WorkAreaRect) \ 3
+    Application.Height = GetRectHeight(WorkAreaRect) \ 3
     Call Form_IniReadPosition(Application, _
         Project_IniFilePath, _
         "Form", "Rect", False)
@@ -63,7 +67,6 @@ Err:
         Err.Source + vbCrLf + _
         Err.Description)
 End Sub
-
 
 '--------------------------------------------------
 '■プロジェクト共通関数

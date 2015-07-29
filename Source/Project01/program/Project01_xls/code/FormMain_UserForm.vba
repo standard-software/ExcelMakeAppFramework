@@ -1,10 +1,10 @@
 '--------------------------------------------------
-'Excel Make App Framework
-'FormMain
-'
+'Excel MakeApp Framework
+'--------------------------------------------------
+'ModuleName:    Main Form
 'ObjectName:    FormMain
 '--------------------------------------------------
-'version:       2015/03/11
+'Version:       2015/07/29
 '--------------------------------------------------
 Option Explicit
 
@@ -18,7 +18,7 @@ Public Args As String
 
 Private FormProperty As New st_vba_FormProperty
 
-Private AnchorMenuButton As New st_vba_ControlAnchor
+Private FAnchorMenuButton As New st_vba_ControlAnchor
 
 '----------------------------------------
 '◆ユーザー用
@@ -108,7 +108,7 @@ Private Sub UserForm_Activate()
         '------------------------------
         '◇フレームワークアンカー初期化処理
         '------------------------------
-        Call AnchorMenuButton.Initialize( _
+        Call FAnchorMenuButton.Initialize( _
             Me.FrameMenuButton, _
             HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
             VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
@@ -215,7 +215,6 @@ Public Sub IniWrite()
 
 End Sub
 
-
 '----------------------------------------
 '◆リサイズイベント
 '----------------------------------------
@@ -224,7 +223,7 @@ Private Sub UserForm_Resize()
         '------------------------------
         '◇フレームワークアンカーレイアウト処理
         '------------------------------
-        Call AnchorMenuButton.Layout
+        Call FAnchorMenuButton.Layout
 
         '------------------------------
         '◇ユーザー用アンカーレイアウト処理
@@ -265,27 +264,40 @@ Private Sub ImageMenuButton_Click()
     MenuItemAppClose.FaceId = 0
     MenuItemAppClose.OnAction = PopupMenu_ActionText("AppClose")
 
+    Dim XOffset As Long: XOffset = 14
+    Dim XOffsetResizeOn As Long: XOffsetResizeOn = 8
+    Dim XOffsetResizeOff As Long: XOffsetResizeOff = 4
+    Dim YOffsetTitleBarOn As Long: YOffsetTitleBarOn = 20
+    Dim YOffsetTitleBarOff As Long: YOffsetTitleBarOff = 0
+    Dim YOffsetResizeOn As Long: YOffsetResizeOn = 8
+    Dim YOffsetResizeOff As Long: YOffsetResizeOff = 4
+
+    XOffset = XOffset * (GetDPI / 96)
+    XOffsetResizeOn = XOffsetResizeOn * (GetDPI / 96)
+    XOffsetResizeOff = XOffsetResizeOff * (GetDPI / 96)
+    YOffsetTitleBarOn = YOffsetTitleBarOn * (GetDPI / 96)
+    YOffsetTitleBarOff = YOffsetTitleBarOff * (GetDPI / 96)
+    YOffsetResizeOn = YOffsetResizeOn * (GetDPI / 96)
+    YOffsetResizeOff = YOffsetResizeOff * (GetDPI / 96)
+
     Select Case PopupMenu_PopupReturn(PopupMenu, _
         PointToPixel(Me.Left + FrameMenuButton.Left + FrameMenuButton.Width) _
-        + IIf(FormProperty.ResizeFrame, 8, 4) _
-        - PopupMenu.Width + 14, _
+        + IIf(FormProperty.ResizeFrame, XOffsetResizeOn, XOffsetResizeOff) _
+        - PopupMenu.Width + XOffset, _
         PointToPixel(Me.Top + FrameMenuButton.Top + FrameMenuButton.Height) _
-        + IIf(FormProperty.ResizeFrame, 8, 4) _
-        + IIf(FormProperty.TitleBar, 20, 0))
+        + IIf(FormProperty.ResizeFrame, YOffsetResizeOn, YOffsetResizeOff) _
+        + IIf(FormProperty.TitleBar, YOffsetTitleBarOn, YOffsetTitleBarOff))
     Case "CreateAppShortcut"
         Call Load(FormCreateAppShortcut)
         Call FormCreateAppShortcut.ShowDialog( _
             Me, FormProperty.TopMost)
         Call Unload(FormCreateAppShortcut)
     Case "VersionInfo"
-        Call TaskDialogMsgBox( _
-            FormProperty.Handle, _
-            ExtractIcon(0, Project_MainIconFilePath, Project_MainIconIndex), _
-            Project_VersionDialogWindowTitle, _
-            Project_VersionDialogInstruction, _
+        Call MsgBox( _
+            Project_VersionDialogInstruction + vbNewLine + _
             Project_VersionDialogContent, _
-            TDCBF_OK_BUTTON, _
-            True)
+            vbOKOnly, _
+            Project_VersionDialogWindowTitle)
     Case "AppClose"
         FormClose
     End Select

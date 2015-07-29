@@ -1,10 +1,10 @@
 '--------------------------------------------------
-'Excel Make App Framework
-'Main Module
-'
+'Excel MakeApp Framework
+'--------------------------------------------------
+'ModuleName:    Main Module
 'ObjectName:    ModuleMain
 '--------------------------------------------------
-'ÉoÅ[ÉWÉáÉì     2014/12/06
+'Version:       2015/07/29
 '--------------------------------------------------
 Option Explicit
 
