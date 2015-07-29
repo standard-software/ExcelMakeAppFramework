@@ -43,6 +43,17 @@ Excel MakeApp Framework です。
 より多くの開発者の方に提供させていただくために
 MIT ライセンスとします。
 
+■対応
+Excel MakeApp Framework は次の Excel に対応しています。
+・  Excel 2010 32bit for Windows
+・  Excel 2013 32bit for Windows
+・  Excel 2013 64bit for Windows
+
+おそらく、Excel 2010 64bit for Windows にも対応していますが
+動作確認できていないので、記載していません。
+
+また、Excel for Mac には対応していません。
+
 
 ■使用方法
 
