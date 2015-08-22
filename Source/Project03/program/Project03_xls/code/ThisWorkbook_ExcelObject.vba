@@ -4,13 +4,17 @@
 'ModuleName:    Project03 ThisWorkbook
 'ObjectName:    ThisWorkbook
 '--------------------------------------------------
-'Version:       2015/07/29
+'Version:       2015/08/19
 '--------------------------------------------------
 Option Explicit
 
 Public OriginalWindowRectBuffer As String
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    If Application.WindowState = xlMaximized Then
+        Application.WindowState = xlNormal
+    End If
+
     Call Form_IniWritePosition(Application, _
         Project_IniFilePath, _
         "Form", "Rect")
