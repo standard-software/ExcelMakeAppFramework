@@ -106,12 +106,26 @@ Private Sub UserForm_Activate()
         End If
 
         '------------------------------
+        '◇メニューボタンを右上端にする
+        '------------------------------
+        Me.FrameMenuButton.Top = 0
+        Me.FrameMenuButton.Left = _
+            Me.FrameMenuButton.Parent.InsideWidth - _
+            Me.FrameMenuButton.Width + 1
+
+        '------------------------------
         '◇フレームワークアンカー初期化処理
         '------------------------------
         Call FAnchorMenuButton.Initialize( _
             Me.FrameMenuButton, _
-            HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
+        'Excel2016では、Offset値はResizeFrameにかかわらず0になる
+        'Excel2013では下記のコードが有効
+        'Call FAnchorMenuButton.Initialize( _
+        '   Me.FrameMenuButton, _
+        '   HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
+        '   VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
 
         '------------------------------
         '◇ユーザー用アンカー初期化処理

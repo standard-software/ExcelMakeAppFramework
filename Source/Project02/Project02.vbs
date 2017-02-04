@@ -18,7 +18,7 @@ Call Main
 Sub Main
 Do
     Dim ExcelApp1
-    Set ExcelApp1 = CreateObject("Excel.Application")
+    Set ExcelApp1 = CreateObject_Excel_Application
     If ExcelApp1 Is Nothing Then
         Call MsgBox("Excelがインストールされていません。")
         Exit Do
@@ -54,3 +54,8 @@ On Error Resume Next
 Loop While False
 End Sub
 
+Function CreateObject_Excel_Application
+On Error Resume Next
+    Set CreateObject_Excel_Application = Nothing
+    Set CreateObject_Excel_Application = CreateObject("Excel.Application")
+End Function

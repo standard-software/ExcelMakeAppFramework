@@ -114,12 +114,26 @@ Private Sub UserForm_Activate()
         End If
 
         '------------------------------
+        '◇メニューボタンを右上端にする
+        '------------------------------
+        Me.FrameMenuButton.Top = 0
+        Me.FrameMenuButton.Left = _
+            Me.FrameMenuButton.Parent.InsideWidth - _
+            Me.FrameMenuButton.Width + 1
+
+        '------------------------------
         '◇フレームワークアンカー初期化処理
         '------------------------------
         Call FAnchorMenuButton.Initialize( _
             Me.FrameMenuButton, _
-            HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
+        'Excel2016では、Offset値はResizeFrameにかかわらず0になる
+        'Excel2013では下記のコードが有効
+        'Call FAnchorMenuButton.Initialize( _
+        '   Me.FrameMenuButton, _
+        '   HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
+        '   VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
 
         '------------------------------
         '◇ユーザー用アンカー初期化処理
@@ -128,24 +142,24 @@ Private Sub UserForm_Activate()
         '------------------------------
         Call FAnchorLeftTextBox.Initialize( _
             Me.TextBoxLeft, _
-            HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
         Call FAnchorTopTextBox.Initialize( _
             Me.TextBoxTop, _
-            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
         Call FAnchorBottomTextBox.Initialize( _
             Me.TextBoxBottom, _
-            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
         Call FAnchorSplitter1.Initialize( _
             Me.ImageSplitter1, _
-            HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
         Call FAnchorSplitter2.Initialize( _
             Me.ImageSplitter2, _
-            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 8, 0), _
-            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
+            HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
+            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
 
         Call FSplitter1.Initialize( _
             ImageSplitter1, _
@@ -164,7 +178,7 @@ Private Sub UserForm_Activate()
         Call FSplitter2.AddControlRightBottom(TextBoxBottom)
 
         Call IniRead_UserFormActivate
-        
+
         'レイアウトアンカーを動作させる
         Call UserForm_Resize
 
