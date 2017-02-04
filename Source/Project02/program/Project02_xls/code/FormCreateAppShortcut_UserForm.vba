@@ -4,7 +4,7 @@
 'ModuleName:    CreateAppShortcut Form
 'ObjectName:    FormCreateAppShortcut
 '--------------------------------------------------
-'Version:       2015/07/29
+'Version:       2017/02/05
 '--------------------------------------------------
 Option Explicit
 
@@ -100,16 +100,18 @@ Optional ByVal TopMost As Boolean = False)
             ProjectScriptFilePath, _
             Project_MainIconFilePath, Project_Name, True)
             
-        '[Win7AppId.exe_]を[Win7AppId.exe]に変換する関数
+        '[Win7AppId.exe_]を[Win7AppId.exe]に変換
         If fso.FileExists(Project_TaskbarPinCommandExeFilePath) = False Then
             If fso.FileExists(Project_TaskbarPinCommandExeFilePath + "_") Then
                 Call fso.MoveFile( _
                     Project_TaskbarPinCommandExeFilePath + "_", _
                     Project_TaskbarPinCommandExeFilePath)
+            Else
+                Call Assert(False, "Error:Win7AppId.exe_ is not exist.")
             End If
         End If
             
-        If FileCreateWait(Project_TaskbarPinCommandExeFilePath) Then
+        If FileExistsWait(Project_TaskbarPinCommandExeFilePath) Then
             Call SetTaskbarPinShortcutIcon(CheckBoxTaskbarPin.Value, _
                 Project_ShortcutFilePath_TaskbarPin, _
                 ProjectScriptFilePath, _
@@ -118,6 +120,27 @@ Optional ByVal TopMost As Boolean = False)
                 "Microsoft " + ChrW(&HAE) + " Console Based Script Host.lnk", _
                 Project_TaskbarPinCommandExeFilePath, _
                 Project_AppID)
+            
+            If (CheckBoxTaskbarPin.Value) Then
+                If FileExistsWait(Project_ShortcutFilePath_TaskbarPin) Then
+                    'コマンド完了を待ってから実行
+                    '[Win7AppId.exe]を[Win7AppId.exe_]に変換
+                    Call fso.MoveFile( _
+                        Project_TaskbarPinCommandExeFilePath, _
+                        Project_TaskbarPinCommandExeFilePath + "_")
+                End If
+            End If
+            
+            If (CheckBoxTaskbarPin.Value = False) Then
+                If FileExistsWait(Project_ShortcutFilePath_TaskbarPin, False) Then
+                    'コマンド完了を待ってから実行
+                    '[Win7AppId.exe]を[Win7AppId.exe_]に変換
+                    Call fso.MoveFile( _
+                        Project_TaskbarPinCommandExeFilePath, _
+                        Project_TaskbarPinCommandExeFilePath + "_")
+                End If
+            End If
+            
         End If
         
     End If
@@ -130,3 +153,10 @@ Private Sub UserForm_Activate()
     End If
 End Sub
 
+'--------------------------------------------------
+'■履歴
+'◇ ver 2015/07/29
+'・ 作成
+'◇ ver 2017/02/05
+'・ Win7AppId.exe を使用する時以外は Win7AppId.exe_ とする
+'--------------------------------------------------
