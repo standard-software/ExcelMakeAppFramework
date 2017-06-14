@@ -1,7 +1,7 @@
 '--------------------------------------------------
 'st_vba
 '--------------------------------------------------
-'ModuleName:    Base Module
+'ModuleName:    Core Module
 'ObjectName:    st_vba_Core
 '--------------------------------------------------
 'Discription:   Standard Software Library For Windows Excel VBA
@@ -11,9 +11,9 @@
 '   URL:        https://github.com/standard-software/st_vba/blob/master/Document/Readme_jp.txt
 'All Right Reserved:
 '   Name:       Standard Software
-'   URL:        http://standard-software.net/
+'   URL:        https://www.facebook.com/stndardsoftware/
 '--------------------------------------------------
-'Version:       2017/02/05
+'Version:       2017/04/02
 '--------------------------------------------------
 
 '--------------------------------------------------
@@ -66,7 +66,6 @@
 '           C:\Windows\SysWOW64\mscomctl.ocx
 '           C:\Windows\SysWOW64\comctl32.ocx (?)
 '--------------------------------------------------
-
 Option Explicit
 
 '--------------------------------------------------
@@ -212,7 +211,7 @@ Enum RangeClearType
     rcClear
     rcClearContents
     rcClearFormats
-    
+
 End Enum
 
 '----------------------------------------
@@ -259,6 +258,25 @@ End Enum
 #Else
     Const Excel64bit As Boolean = False
 #End If
+
+
+'----------------------------------------
+'◆テキストファイルエンコード
+'----------------------------------------
+Public Enum EncodingTypeJpCharCode
+    NONE
+    ASCII
+    JIS
+    EUC_JP
+    UTF_7
+    Shift_JIS
+    UTF8_BOM
+    UTF8_BOM_NO
+    UTF16_LE_BOM
+    UTF16_LE_BOM_NO
+    UTF16_BE_BOM
+    UTF16_BE_BOM_NO
+End Enum
 
 '--------------------------------------------------
 '■API
@@ -1213,9 +1231,37 @@ End Sub
 '----------------------------------------
 '・値範囲
 '----------------------------------------
-Public Function InRange(ByVal MinValue As Long, _
-ByVal Value As Long, ByVal MaxValue As Long) As Boolean
+Public Function InRange( _
+ByVal MinValue As Long, _
+ByVal Value As Long, _
+ByVal MaxValue As Long) As Boolean
+
     InRange = ((MinValue <= Value) And (Value <= MaxValue))
+
+End Function
+
+Public Function InRangeCurrency( _
+ByVal MinValue As Currency, _
+ByVal Value As Currency, _
+ByVal MaxValue As Currency) As Boolean
+
+    InRangeCurrency = ((MinValue <= Value) And (Value <= MaxValue))
+    
+End Function
+
+'----------------------------------------
+'・乱数
+'----------------------------------------
+'   ・  指定範囲の乱数を生成する
+'   ・  実行前に乱数列を初期化するには
+'           Call Randomize
+'       を行う
+'----------------------------------------
+Function RandomValue( _
+ByVal MinValue As Long, ByVal MaxValue As Long) As Long
+
+    RandomValue = Int((MaxValue - MinValue + 1) * Rnd + MinValue)
+
 End Function
 
 '----------------------------------------
@@ -1284,14 +1330,14 @@ End Function
 '----------------------------------------
 '・First
 '----------------------------------------
-Public Function IsFirstStr(ByVal Str As String, ByVal SubStr As String) As Boolean
+Public Function IsFirstStr(ByVal str As String, ByVal SubStr As String) As Boolean
     Dim Result As Boolean: Result = False
     Do
         If SubStr = "" Then Exit Do
-        If Str = "" Then Exit Do
-        If Len(Str) < Len(SubStr) Then Exit Do
+        If str = "" Then Exit Do
+        If Len(str) < Len(SubStr) Then Exit Do
 
-        If InStr(1, Str, SubStr) = 1 Then
+        If InStr(1, str, SubStr) = 1 Then
             Result = True
         End If
     Loop While False
@@ -1308,11 +1354,11 @@ Private Sub testIsFirstStr()
     Call Check(False, IsFirstStr("123", "1234"))
 End Sub
 
-Public Function IncludeFirstStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsFirstStr(Str, SubStr) Then
-        IncludeFirstStr = Str
+Public Function IncludeFirstStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsFirstStr(str, SubStr) Then
+        IncludeFirstStr = str
     Else
-        IncludeFirstStr = SubStr + Str
+        IncludeFirstStr = SubStr + str
     End If
 End Function
 
@@ -1323,11 +1369,11 @@ Private Sub testIncludeFirstStr()
     Call Check("2312345", IncludeFirstStr("12345", "23"))
 End Sub
 
-Public Function ExcludeFirstStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsFirstStr(Str, SubStr) Then
-        ExcludeFirstStr = Mid$(Str, Len(SubStr) + 1)
+Public Function ExcludeFirstStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsFirstStr(str, SubStr) Then
+        ExcludeFirstStr = Mid$(str, Len(SubStr) + 1)
     Else
-        ExcludeFirstStr = Str
+        ExcludeFirstStr = str
     End If
 End Function
 
@@ -1341,14 +1387,14 @@ End Sub
 '----------------------------------------
 '・Last
 '----------------------------------------
-Public Function IsLastStr(ByVal Str As String, ByVal SubStr As String) As Boolean
+Public Function IsLastStr(ByVal str As String, ByVal SubStr As String) As Boolean
     Dim Result As Boolean: Result = False
     Do
         If SubStr = "" Then Exit Do
-        If Str = "" Then Exit Do
-        If Len(Str) < Len(SubStr) Then Exit Do
+        If str = "" Then Exit Do
+        If Len(str) < Len(SubStr) Then Exit Do
 
-        If Mid$(Str, Len(Str) - Len(SubStr) + 1) = SubStr Then
+        If Mid$(str, Len(str) - Len(SubStr) + 1) = SubStr Then
             Result = True
         End If
     Loop While False
@@ -1365,11 +1411,11 @@ Private Sub testIsLastStr()
     Call Check(False, IsLastStr("123", "1234"))
 End Sub
 
-Public Function IncludeLastStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsLastStr(Str, SubStr) Then
-        IncludeLastStr = Str
+Public Function IncludeLastStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsLastStr(str, SubStr) Then
+        IncludeLastStr = str
     Else
-        IncludeLastStr = Str + SubStr
+        IncludeLastStr = str + SubStr
     End If
 End Function
 
@@ -1380,11 +1426,11 @@ Private Sub testIncludeLastStr()
     Call Check("1234534", IncludeLastStr("12345", "34"))
 End Sub
 
-Public Function ExcludeLastStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsLastStr(Str, SubStr) Then
-        ExcludeLastStr = Mid$(Str, 1, Len(Str) - Len(SubStr))
+Public Function ExcludeLastStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsLastStr(str, SubStr) Then
+        ExcludeLastStr = Mid$(str, 1, Len(str) - Len(SubStr))
     Else
-        ExcludeLastStr = Str
+        ExcludeLastStr = str
     End If
 End Function
 
@@ -1398,14 +1444,14 @@ End Sub
 '----------------------------------------
 '・Both
 '----------------------------------------
-Public Function IncludeBothEndsStr(ByVal Str As String, ByVal SubStr As String) As String
+Public Function IncludeBothEndsStr(ByVal str As String, ByVal SubStr As String) As String
     IncludeBothEndsStr = _
-        IncludeFirstStr(IncludeLastStr(Str, SubStr), SubStr)
+        IncludeFirstStr(IncludeLastStr(str, SubStr), SubStr)
 End Function
 
-Public Function ExcludeBothEndsStr(ByVal Str As String, ByVal SubStr As String) As String
+Public Function ExcludeBothEndsStr(ByVal str As String, ByVal SubStr As String) As String
     ExcludeBothEndsStr = _
-        ExcludeFirstStr(ExcludeLastStr(Str, SubStr), SubStr)
+        ExcludeFirstStr(ExcludeLastStr(str, SubStr), SubStr)
 End Function
 
 
@@ -1527,9 +1573,9 @@ End Sub
 '----------------------------------------
 Public Function TagInnerText(ByVal Text As String, _
     ByVal StartTag As String, ByVal EndTag As String) As String
-    
+
     Dim Result As String
-    Result = IfEmptyStr(LastStrFirstDelim(Text, StartTag), Text)
+    Result = LastStrFirstDelim(Text, StartTag)
     Result = FirstStrFirstDelim(Result, EndTag)
     TagInnerText = Result
 End Function
@@ -1541,7 +1587,27 @@ Public Sub testTagInnerText()
     Call Check("456", TagInnerText("456<789>000", "<123>", "<789>"))
     Call Check("456", TagInnerText("456", "<123>", "<789>"))
     Call Check("", TagInnerText("000<123><789>000", "<123>", "<789>"))
+    
+    Call Check("123", TagInnerText("<123>123<789> <123>456<789> <123>789<789>", "<123>", "<789>"))
+    Dim Text As String
+    Text = "<123>123<789> <123>456<789> <123>789<789>"
+    Call Check("<123>123", TagInnerText(Text, "<456>", "<789>"))
+    Call Check("", TagInnerText(Text, "<456>", "<123>"))
+    Call Check(Text, TagInnerText(Text, "<321>", "<456>"))
 End Sub
+
+'----------------------------------------
+'・タグの内部文字列、後方検索版
+'----------------------------------------
+Public Function TagInnerTextLast(ByVal Text As String, _
+    ByVal StartTag As String, ByVal EndTag As String) As String
+
+    Dim Result As String
+    Result = LastStrLastDelim(Text, StartTag)
+    Result = FirstStrLastDelim(Result, EndTag)
+    TagInnerTextLast = Result
+End Function
+
 
 '----------------------------------------
 '・タグを含んだ内部文字列
@@ -1555,7 +1621,7 @@ Public Function TagOuterText(ByVal Text As String, _
     If Result1 <> Text Then
         Result1 = StartTag + Result1
     End If
-    
+
     Result2 = FirstStrFirstDelim(Result1, EndTag)
     If Result2 <> Result1 Then
         Result2 = Result2 + EndTag
@@ -1579,7 +1645,7 @@ End Sub
 '----------------------------------------
 Public Function TagOuterTextList(ByVal Text As String, _
     ByVal StartTag As String, ByVal EndTag As String) As String
-    
+
     Dim Result As String: Result = ""
     Dim StartTagToEnd As String
     Dim InnerText As String
@@ -1900,7 +1966,7 @@ On Error GoTo Err:
     Result = False
     Do
         If (MatchWord = "") Or (Text = "") Then Exit Do
-        
+
         '正規表現用オブジェクト用意
         Dim RegCreateFlag As Boolean
         RegCreateFlag = False
@@ -1908,7 +1974,7 @@ On Error GoTo Err:
             RegCreateFlag = True
             Set RegExp = CreateObject("VBScript.RegExp")
         End If
-        
+
         '正規表現マッチ調査
         RegExp.Pattern = MatchWord
         RegExp.Global = True
@@ -1917,11 +1983,11 @@ On Error GoTo Err:
         If 1 <= Match.Count Then
             Result = True
         End If
-        
+
         If RegCreateFlag Then
             Set RegExp = Nothing
         End If
-            
+
     Loop While False
     MatchRegExp = Result
     Exit Function
@@ -1945,7 +2011,7 @@ On Error GoTo Err:
     Dim Result As String: Result = Value
     Do
         If (Pattern = "") Or (Value = "") Then Exit Do
-        
+
         '正規表現用オブジェクト用意
         Dim RegCreateFlag As Boolean
         RegCreateFlag = False
@@ -1953,18 +2019,18 @@ On Error GoTo Err:
             RegCreateFlag = True
             Set RegExp = CreateObject("VBScript.RegExp")
         End If
-        
+
         '正規表現マッチ調査
         RegExp.Pattern = Pattern
         RegExp.IgnoreCase = (CaseCompare = IgnoreCase)
         RegExp.Global = True
-        
+
         Result = RegExp.Replace(Value, NewValue)
-        
+
         If RegCreateFlag Then
             Set RegExp = Nothing
         End If
-            
+
     Loop While False
 Err:
     ReplaceRegExp = Result
@@ -2047,16 +2113,16 @@ Optional ByVal CaseCompare As CaseCompare = CaseSensitive) As String
 
     Dim Result As String
     Result = Value
-    
+
     Dim RegExp As Object
     Set RegExp = CreateObject("VBScript.RegExp")
-    
+
     Dim I As Long
     For I = 0 To ArrayCount(OldTableArray) - 1
         Result = ReplaceRegExp(Result, OldTableArray(I), NewTableArray(I), CaseCompare, RegExp)
     Next
     Set RegExp = Nothing
-    
+
     ReplaceArrayRegExp = Result
 End Function
 
@@ -2074,6 +2140,87 @@ Optional ByVal CaseCompare As CaseCompare = CaseSensitive) As String
     Next
     DeleteArrayRegExp = Result
 End Function
+
+
+'----------------------------------------
+'◇ 文字コード処理
+'----------------------------------------
+
+'----------------------------------------
+'・ 文字列のShiftJIS以外の文字抽出
+'----------------------------------------
+'   ・  全てShiftJISに変換可能なら空文字が返る
+'----------------------------------------
+Public Function String_GetOutShiftJIS(ByVal Value As String) As String
+    Dim Result As String: Result = ""
+    Dim Character As String
+    Dim I As Integer
+    For I = 1 To Len(Value)
+        Character = Mid(Value, I, 1)
+        If StrConv(StrConv(Character, vbFromUnicode), vbUnicode) <> Character Then
+            Result = Result + Character
+        End If
+    Next I
+    String_GetOutShiftJIS = Result
+End Function
+
+Public Sub test_String_GetOutShiftJIS()
+    Call Check("", String_GetOutShiftJIS("テスト"))
+    Call Check(ChrW(&H33A5), String_GetOutShiftJIS("あいうえお" + ChrW(&H33A5)))
+End Sub
+
+
+'----------------------------------------
+'・ 文字列のShiftJISの外字抽出
+'----------------------------------------
+'   ・  SJISには外字として
+'       ＮＥＣ選定特文字
+'       ＩＢＭ拡張文字
+'       というものがあり、それを抽出する
+'   ・  １．ＮＥＣ選定特文字
+'           開始：まる数字の１「いち」（34624）
+'　　　　　 終了：直角三角形「でるた」(34713)
+'
+'       ※  実際には、合併集合「しゅうごう」(34716)までだが
+'           別の文字コードが優先される。
+'　　　　　 下記のNo.３がそれ、
+'
+'　　   ２．ＩＢＭ拡張文字
+'　　　　　 開始：ローマ数字の小文字の１「いち」（64064）
+'　　　　　 終了：黒に似た漢字「ＩＭＥのコード一覧で表示して下さい。」（64587）
+'
+'　　   ３．ＮＥＣ選定特文字で１の範囲外
+'　　　　　 (1)Ｕに似た記号「しゅうごう」（33214）
+'　　　　　 (2)Ｕを逆さにした記号「しゅうごう」（33215）
+'　　　　　 (3)点３つ「なぜならば」(33254)
+'----------------------------------------
+Public Function String_GetMachineDependentCharacter(ByVal Value As String) As String
+    Dim Result As String
+    Result = ""
+    Dim CharIntValue As Integer
+    Dim I As Integer
+    For I = 1 To Len(Value)
+        CharIntValue = Asc(Mid(Value, I, 1))
+        If ((Asc(Chr(34624)) <= CharIntValue) And (CharIntValue <= Asc(Chr(34713)))) _
+        Or ((Asc(Chr(64064)) <= CharIntValue) And (CharIntValue <= Asc(Chr(64587)))) _
+        Or (CharIntValue = Asc(Chr(33214))) _
+        Or (CharIntValue = Asc(Chr(33215))) _
+        Or (CharIntValue = Asc(Chr(33254))) Then
+            Result = Result & Chr(CharIntValue)
+        End If
+    Next I
+    String_GetMachineDependentCharacter = Result
+End Function
+
+Public Sub test_String_GetMachineDependentCharacter()
+    Call Check("", String_GetMachineDependentCharacter("高橋"))
+    Call Check("髙", String_GetMachineDependentCharacter("髙橋"))
+    Call Check("", String_GetMachineDependentCharacter("山崎"))
+    Call Check("﨑", String_GetMachineDependentCharacter("山﨑"))
+    Call Check("", String_GetMachineDependentCharacter(""))
+    Call Check("髙", String_GetMachineDependentCharacter("髙橋"))
+End Sub
+
 
 '----------------------------------------
 '◆日付時刻処理
@@ -2245,7 +2392,58 @@ Public Function FormatYYYYMMDDHHMMSS_Hyphen(ByVal DateTimeValue)
         FormatHH_MM_SS(DateTimeValue, "-")
 End Function
 
+'----------------------------------------
+'・Format文を変換してYYYYMMDDHHNNSS以外の変換を行わせない関数
+'----------------------------------------
+'   ・  日付時刻とは関係のないFomat関数の書式文字列を使えなくして
+'       日付時刻書式だけを指定できるようにした
+'----------------------------------------
+Public Function Format_Date_UseOnlyYMDHNS( _
+ByVal DateValue As Date, _
+ByVal FormatStr As String) As String
+    Dim Result As String: Result = ""
+    Result = Format(DateValue, _
+        ReplaceArrayValue(FormatStr, _
+            ArrayStr("\", "0", "#", "%", "@", "&", "!", "<", ">", "."), _
+            ArrayStr("\\", "\0", "\#", "\%", "\@", "\&", "\!", "\<", "\>", "\.")))
+    Format_Date_UseOnlyYMDHNS = Result
+End Function
 
+Public Sub testFormat_Date_UseOnlyYMDHNS()
+    Dim DateValue As Date
+    DateValue = CDate("2017/03/21")
+    
+    Call Check("2017/03/21", Format(DateValue, "@"))
+    Call Check("A-B-C", Format("ABC", "@-@-@"))
+    Call Check("ABC", Format("ABC", "@@"))
+    Call Check("ABC", Format("ABC", "@@@"))
+    Call Check(" ABC", Format("ABC", "@@@@"))
+    Call Check("ABC ", Format("ABC", "!@@@@"))
+    Call Check(" abc", Format("ABC", "<@@@@"))
+    Call Check(" ABC", Format("abc", ">@@@@"))
+    Call Check("A-B-C", Format("ABC", "&-&-&"))
+    Call Check("ABC", Format("ABC", "&&"))
+    Call Check("ABC", Format("ABC", "&&&"))
+    Call Check("ABC", Format("ABC", "&&&&"))
+    Call Check("123.4.0.0.", Format("123.4", ".0.0.0."))
+    Call Check(",123", Format("123456", ",0,0,0,"))
+    
+    Call Check("@", Format_Date_UseOnlyYMDHNS(DateValue, "@"))
+    Call Check("@-@-@", Format_Date_UseOnlyYMDHNS(DateValue, "@-@-@"))
+    Call Check("@@", Format_Date_UseOnlyYMDHNS(DateValue, "@@"))
+    Call Check("@@@", Format_Date_UseOnlyYMDHNS(DateValue, "@@@"))
+    Call Check("@@@@", Format_Date_UseOnlyYMDHNS(DateValue, "@@@@"))
+    Call Check("!@@@@", Format_Date_UseOnlyYMDHNS(DateValue, "!@@@@"))
+    Call Check("<@@@@", Format_Date_UseOnlyYMDHNS(DateValue, "<@@@@"))
+    Call Check(">@@@@", Format_Date_UseOnlyYMDHNS(DateValue, ">@@@@"))
+    Call Check("&-&-&", Format_Date_UseOnlyYMDHNS(DateValue, "&-&-&"))
+    Call Check("&&", Format_Date_UseOnlyYMDHNS(DateValue, "&&"))
+    Call Check("&&&", Format_Date_UseOnlyYMDHNS(DateValue, "&&&"))
+    Call Check("&&&&", Format_Date_UseOnlyYMDHNS(DateValue, "&&&&"))
+    Call Check(".0.0.0.", Format_Date_UseOnlyYMDHNS(DateValue, ".0.0.0."))
+    Call Check(",0,0,0,", Format_Date_UseOnlyYMDHNS(DateValue, ",0,0,0,"))
+
+End Sub
 
 '----------------------------------------
 '◆配列処理
@@ -2301,18 +2499,18 @@ Private Sub testArrayCount()
     Call Check(0, ArrayCount(Array()))
     Call Check(1, ArrayCount(Split("123", ",")))
     Call Check(2, ArrayCount(Split("1,3", ",")))
-    
+
     '二次元配列
     Dim B(3, 4) As String
     Call Check(4, ArrayCount(B, 1))
     Call Check(5, ArrayCount(B, 2))
-    
+
     '三次元配列
     Dim C(5, 6, 7) As String
     Call Check(6, ArrayCount(C, 1))
     Call Check(7, ArrayCount(C, 2))
     Call Check(8, ArrayCount(C, 3))
-    
+
 End Sub
 
 
@@ -2345,17 +2543,17 @@ Private Sub testArrayAdd()
     Set B(2) = CreateObject("ADODB.Stream")
     Call ArrayAdd(B, fso)
     Call Check("test.txt", B(3).GetFileName("C:\temp\test.txt"))
-    
+
     '二次元配列
     Dim C() As String
     ReDim Preserve C(3, 4)
     Call Check(4, ArrayCount(C, 1))
     Call Check(5, ArrayCount(C, 2))
-    
+
     ReDim Preserve C(3, 5)
     Call Check(4, ArrayCount(C, 1))
     Call Check(6, ArrayCount(C, 2))
-    
+
 '    Call SetValue(C(UBound(C)), "abc")
 End Sub
 
@@ -2657,7 +2855,7 @@ Sub testArrayIndexOf()
     Call Check(1, ArrayIndexOf(A, "C"))
     Call Check(2, ArrayIndexOf(A, "D"))
     Call Check(-1, ArrayIndexOf(A, "E"))
-    
+
     Call Check(0, ArrayIndexOf(A, "B", 0))
     Call Check(1, ArrayIndexOf(A, "C", 1))
     Call Check(2, ArrayIndexOf(A, "D", 2))
@@ -2665,33 +2863,33 @@ Sub testArrayIndexOf()
     Call Check(-1, ArrayIndexOf(A, "C", 2))
     Call Check(2, ArrayIndexOf(A, "D", 2))
     Call Check(-1, ArrayIndexOf(A, "D", 3))
-    
+
     'PartMatch IgnoreCase
     A = Array("ABC", "DEF", "123")
     Call Check(1, ArrayIndexOf(A, "DE", , CaseSensitive, PartMatch))
     Call Check(-1, ArrayIndexOf(A, "de", , CaseSensitive, PartMatch))
     Call Check(1, ArrayIndexOf(A, "de", , IgnoreCase, PartMatch))
-    
+
     'Like WildCard Value
     A = Array("B", "C", "D")
     Call Check(0, ArrayIndexOf(A, "B", , , WildCardValue))
     Call Check(1, ArrayIndexOf(A, "C", , , WildCardValue))
     Call Check(2, ArrayIndexOf(A, "D", , , WildCardValue))
     Call Check(-1, ArrayIndexOf(A, "E", , , WildCardValue))
-    
+
     Call Check(0, ArrayIndexOf(A, "B", 0, , WildCardValue))
     Call Check(1, ArrayIndexOf(A, "C", 1, , WildCardValue))
     Call Check(2, ArrayIndexOf(A, "D", 2, , WildCardValue))
     Call Check(-1, ArrayIndexOf(A, "B", 1, , WildCardValue))
     Call Check(-1, ArrayIndexOf(A, "C", 2, , WildCardValue))
     Call Check(-1, ArrayIndexOf(A, "D", 3, , WildCardValue))
-    
+
     A = Array("ABC", "DEF", "123")
     Call Check(0, ArrayIndexOf(A, "A*", , , WildCardValue))
     Call Check(1, ArrayIndexOf(A, "D*", , , WildCardValue))
     Call Check(2, ArrayIndexOf(A, "1?3", , , WildCardValue))
     Call Check(-1, ArrayIndexOf(A, "A?B", , , WildCardValue))
-    
+
     Call Check(0, ArrayIndexOf(A, "*C", 0, , WildCardValue))
     Call Check(1, ArrayIndexOf(A, "?E?", 1, , WildCardValue))
     Call Check(2, ArrayIndexOf(A, "?23", 2, , WildCardValue))
@@ -2711,7 +2909,7 @@ Sub testArrayIndexOf()
     'RegExp Value
     A = Array("ABC", "DEF", "123")
     Call Check(0, ArrayIndexOf(A, ".*C", 0, , RegExpValue))
-    
+
     'RegExp Value IgnoreCase
     Call Check(-1, ArrayIndexOf(A, ".*c", 0, , RegExpValue))
     Call Check(0, ArrayIndexOf(A, ".*C", 0, , RegExpValue))
@@ -2736,7 +2934,7 @@ Public Function ArrayIsUnique(ByRef ArrayValue As Variant) As Boolean
     Call Assert(IsArray(ArrayValue), "Error:ArrayIsUnique:ArrayValue is not array")
     Call Assert(ArrayDimension(ArrayValue) = 1, _
         "Error:ArrayIsUnique:ArrayValue Dimension is miss")
-    
+
     Dim Result As Boolean: Result = True
     Do
         If OrValue(ArrayCount(ArrayValue), 0, 1) Then Exit Do
@@ -2759,7 +2957,7 @@ Sub testArrayIsUnique()
     Dim A As Variant
     A = Array("B", "C", "D", "A", "B", "C")
     Call Check(False, ArrayIsUnique(A))
-    
+
     A = Array("1", "2", "3", "A", "B", "C")
     Call Check(True, ArrayIsUnique(A))
 End Sub
@@ -2928,20 +3126,20 @@ Optional ByVal IndexMin As Long = -1, Optional ByVal IndexMax As Long = -1)
 
     Call Assert(IsArray(ArrayValue), "Error:ArrayValue is not Array")
     Call Assert(ArrayDimension(ArrayValue) = 1, "Error:ArrayValue Dimension is miss")
-    
+
     Call Assert(IndexMin <= IndexMax, "Error:IndexMin < IndexMax")
     Call Assert(InRange(-1, IndexMin, ArrayCount(ArrayValue) - 1), "Error:IndexMin Range is miss")
     Call Assert(InRange(-1, IndexMax, ArrayCount(ArrayValue) - 1), "Error:IndexMax Range is miss")
-    
+
     '1以下ならソート不可能なのでExitする
     If ArrayCount(ArrayValue) <= 1 Then Exit Sub
-    
+
     IndexMin = IIf(IndexMin = -1, 0, IndexMin)
     IndexMax = IIf(IndexMax = -1, ArrayCount(ArrayValue) - 1, IndexMax)
-    
+
     'IndexMin=IndexMaxならソート不可能なのでExit
     If IndexMin = IndexMax Then Exit Sub
-    
+
     Call ArraySortQuickBase(ArrayValue, SortOrder, IndexMin, IndexMax)
 End Sub
 
@@ -2949,36 +3147,36 @@ End Sub
 Sub ArraySortQuickBase(ByRef ArrayValue As Variant, _
 ByVal SortOrder As SortOrder, _
 ByVal IndexMin As Long, ByVal IndexMax As Long)
-    
+
     Dim IndexCenter As Long
     Dim Index1 As Long
     Dim Index2 As Long
     Dim Value1 As String
     Dim Value2 As String
-    
+
     If IndexMax <= IndexMin Then Exit Sub
-    
+
     IndexCenter = (IndexMin + IndexMax) \ 2
-    
+
     '中央値をバッファ
     Value1 = ArrayValue(IndexCenter)
     '中央値に開始位置要素を代入
     ArrayValue(IndexCenter) = ArrayValue(IndexMin)
-    
+
     Index2 = IndexMin
-    
+
     Index1 = IndexMin + 1
-    
+
     Select Case SortOrder
     Case Ascending
         Do While Index1 <= IndexMax
             If ArrayValue(Index1) < Value1 Then
                 Index2 = Index2 + 1
-                
+
                 Value2 = ArrayValue(Index2)
                 ArrayValue(Index2) = ArrayValue(Index1)
                 ArrayValue(Index1) = Value2
-                
+
             End If
             Index1 = Index1 + 1
         Loop
@@ -2986,21 +3184,21 @@ ByVal IndexMin As Long, ByVal IndexMax As Long)
         Do While Index1 <= IndexMax
             If Value1 < ArrayValue(Index1) Then
                 Index2 = Index2 + 1
-                
+
                 Value2 = ArrayValue(Index2)
                 ArrayValue(Index2) = ArrayValue(Index1)
                 ArrayValue(Index1) = Value2
-                
+
             End If
             Index1 = Index1 + 1
         Loop
     Case Else
         Call Assert(False, "Error:ArraySortQuickBase:SortOrder is miss.")
     End Select
-    
+
     ArrayValue(IndexMin) = ArrayValue(Index2)
     ArrayValue(Index2) = Value1
-    
+
     ' 分割前半を再帰呼び出しでSORT
     Call ArraySortQuickBase(ArrayValue, SortOrder, IndexMin, Index2 - 1)
 
@@ -3016,14 +3214,14 @@ Sub testArrayQuickSort()
     Array1(3) = "102"
     Array1(4) = "104"
     Array1(5) = "100"
-    
+
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "101")
     Call Check(Array1(2), "103")
     Call Check(Array1(3), "102")
     Call Check(Array1(4), "104")
     Call Check(Array1(5), "100")
-    
+
     'Ascending
     Call ArraySortQuick(Array1, SortOrder.Ascending, 2, 4)
     Call Check(Array1(0), "105")
@@ -3032,7 +3230,7 @@ Sub testArrayQuickSort()
     Call Check(Array1(3), "103")
     Call Check(Array1(4), "104")
     Call Check(Array1(5), "100")
-    
+
     Call ArraySortQuick(Array1, SortOrder.Ascending, 0, 2)
     Call Check(Array1(0), "101")
     Call Check(Array1(1), "102")
@@ -3040,7 +3238,7 @@ Sub testArrayQuickSort()
     Call Check(Array1(3), "103")
     Call Check(Array1(4), "104")
     Call Check(Array1(5), "100")
-    
+
     Call ArraySortQuick(Array1)
     Call Check(Array1(0), "100")
     Call Check(Array1(1), "101")
@@ -3048,7 +3246,7 @@ Sub testArrayQuickSort()
     Call Check(Array1(3), "103")
     Call Check(Array1(4), "104")
     Call Check(Array1(5), "105")
-    
+
     'Descending
     Array1(0) = "105"
     Array1(1) = "101"
@@ -3056,7 +3254,7 @@ Sub testArrayQuickSort()
     Array1(3) = "102"
     Array1(4) = "104"
     Array1(5) = "100"
-    
+
     Call ArraySortQuick(Array1, SortOrder.Descending, 2, 4)
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "101")
@@ -3064,7 +3262,7 @@ Sub testArrayQuickSort()
     Call Check(Array1(3), "103")
     Call Check(Array1(4), "102")
     Call Check(Array1(5), "100")
-    
+
     Call ArraySortQuick(Array1, SortOrder.Descending, 0, 2)
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "104")
@@ -3072,7 +3270,7 @@ Sub testArrayQuickSort()
     Call Check(Array1(3), "103")
     Call Check(Array1(4), "102")
     Call Check(Array1(5), "100")
-    
+
     Call ArraySortQuick(Array1, SortOrder.Descending)
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "104")
@@ -3105,7 +3303,7 @@ Optional ByVal SortOrder As SortOrder = SortOrder.Ascending)
         MaxLength = MaxValue(MaxLength, Len(ArrayValue(I)))
     Next
     DigitStrLength = Len(CStr(MaxLength))
-    
+
     Select Case SortOrder
     Case Ascending
         For I = 0 To ArrayCount(ArrayValue) - 1
@@ -3123,7 +3321,7 @@ Optional ByVal SortOrder As SortOrder = SortOrder.Ascending)
         Next
     End Select
     Call ArraySortQuick(ArrayValue)
-    
+
     For I = 0 To ArrayCount(ArrayValue) - 1
         ArrayValue(I) = _
             Mid$(ArrayValue(I), _
@@ -3140,18 +3338,18 @@ Sub testArraySortStrLength()
     Array1(3) = "123"
     Array1(4) = "abc"
     Array1(5) = "a"
-    
+
     Call ArraySortStrLength(Array1, Ascending)
-    
+
     Call Check(Array1(0), "1")
     Call Check(Array1(1), "a")
     Call Check(Array1(2), "12")
     Call Check(Array1(3), "123")
     Call Check(Array1(4), "abc")
     Call Check(Array1(5), "1234")
-    
+
     Call ArraySortStrLength(Array1, SortOrder.Descending)
-    
+
     Call Check(Array1(0), "1234")
     Call Check(Array1(1), "123")
     Call Check(Array1(2), "abc")
@@ -3182,7 +3380,7 @@ Optional NoOrderValuePriority As Boolean = False)
     DigitOrderArray = Len(CStr(ArrayCount(OrderArrayWildCard) + 1))
 
     Dim I As Long
-    
+
     For I = 0 To ArrayCount(ArrayValue) - 1
         Dim OrderArrayIndex As Long
         OrderArrayIndex = _
@@ -3207,7 +3405,7 @@ Optional NoOrderValuePriority As Boolean = False)
         End If
     Next
     Call ArraySortQuick(ArrayValue)
-    
+
     For I = 0 To ArrayCount(ArrayValue) - 1
         ArrayValue(I) = _
             Mid$(ArrayValue(I), _
@@ -3217,11 +3415,11 @@ End Sub
 
 Public Sub testArraySortCustomOrder()
     Dim Array1() As String
-    
+
     Array1 = ArrayStr("b", "a", "s", "ss", "xl", "ll", "m")
-    
+
     Call ArraySortCustomOrder(Array1, ArrayStr("ss*", "s*", "m*", "l*", "ll*", "xl*"))
-    
+
     Call Check(Array1(0), "ss")
     Call Check(Array1(1), "s")
     Call Check(Array1(2), "m")
@@ -3229,12 +3427,12 @@ Public Sub testArraySortCustomOrder()
     Call Check(Array1(4), "xl")
     Call Check(Array1(5), "b")
     Call Check(Array1(6), "a")
-    
+
     Array1 = ArrayStr("Bサイズ", "Aサイズ", _
         "Sサイズ", "SSサイズ", "XLサイズ", "LLサイズ", "Mサイズ")
-    
+
     Call ArraySortCustomOrder(Array1, ArrayStr("ss*", "s*", "m*", "l*", "ll*", "xl*"))
-    
+
     Call Check(Array1(0), "SSサイズ")
     Call Check(Array1(1), "Sサイズ")
     Call Check(Array1(2), "Mサイズ")
@@ -3242,12 +3440,12 @@ Public Sub testArraySortCustomOrder()
     Call Check(Array1(4), "XLサイズ")
     Call Check(Array1(5), "Bサイズ")
     Call Check(Array1(6), "Aサイズ")
-    
+
     Array1 = ArrayStr("Bサイズ", "Aサイズ", _
         "Sサイズ", "SSサイズ", "XLサイズ", "LLサイズ", "Mサイズ")
-    
+
     Call ArraySortCustomOrder(Array1, ArrayStr("ss*", "s*", "m*", "l*", "ll*", "xl*"), , True)
-    
+
     Call Check(Array1(0), "Bサイズ")
     Call Check(Array1(1), "Aサイズ")
     Call Check(Array1(2), "SSサイズ")
@@ -3255,7 +3453,7 @@ Public Sub testArraySortCustomOrder()
     Call Check(Array1(4), "Mサイズ")
     Call Check(Array1(5), "LLサイズ")
     Call Check(Array1(6), "XLサイズ")
-    
+
 End Sub
 
 
@@ -3270,28 +3468,28 @@ Optional ByVal IndexMin As Long = -1, Optional ByVal IndexMax As Long = -1)
 
     Call Assert(IsArray(ArrayValue), "Error:ArrayValue is not Array")
     Call Assert(ArrayDimension(ArrayValue) = 1)
-    
+
     'IndexMin/Maxの指定が変ならエラーにする
     Call Assert(IndexMin <= IndexMax, "Error:IndexMin < IndexMax")
     Call Assert(InRange(-1, IndexMin, ArrayCount(ArrayValue) - 1), _
         "Error:ArrayReverse:IndexMin Range is miss.")
     Call Assert(InRange(-1, IndexMax, ArrayCount(ArrayValue) - 1), _
         "Error:ArrayReverse:IndexMax Range is miss.")
-    
+
     '1以下ならソート不可能なのでExitする
     If ArrayCount(ArrayValue) <= 1 Then Exit Sub
-    
+
     IndexMin = IIf(IndexMin = -1, 0, IndexMin)
     IndexMax = IIf(IndexMax = -1, ArrayCount(ArrayValue) - 1, IndexMax)
-    
+
     'IndexMin=IndexMaxならソート不可能なのでExit
     If IndexMin = IndexMax Then Exit Sub
-    
+
     Dim SortDataCount As Long
     SortDataCount = IndexMax - IndexMin + 1
     Dim DigitSortDataCount As Long
     DigitSortDataCount = Len(SortDataCount)
-    
+
     Dim I As Long
     For I = IndexMin To IndexMax
         ArrayValue(I) = LongToStrDigitZero(I, DigitSortDataCount) + ArrayValue(I)
@@ -3301,7 +3499,7 @@ Optional ByVal IndexMin As Long = -1, Optional ByVal IndexMax As Long = -1)
         ArrayValue(I) = Mid$(ArrayValue(I), _
             DigitSortDataCount + 1)
     Next
-    
+
 End Sub
 
 Public Sub testArrayReverse()
@@ -3312,14 +3510,14 @@ Public Sub testArrayReverse()
     Array1(3) = "102"
     Array1(4) = "104"
     Array1(5) = "100"
-    
+
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "101")
     Call Check(Array1(2), "103")
     Call Check(Array1(3), "102")
     Call Check(Array1(4), "104")
     Call Check(Array1(5), "100")
-    
+
     Call ArrayReverse(Array1, 2, 4)
     Call Check(Array1(0), "105")
     Call Check(Array1(1), "101")
@@ -3327,7 +3525,7 @@ Public Sub testArrayReverse()
     Call Check(Array1(3), "102")
     Call Check(Array1(4), "103")
     Call Check(Array1(5), "100")
-    
+
     Call ArrayReverse(Array1, 0, 2)
     Call Check(Array1(0), "104")
     Call Check(Array1(1), "101")
@@ -3335,7 +3533,7 @@ Public Sub testArrayReverse()
     Call Check(Array1(3), "102")
     Call Check(Array1(4), "103")
     Call Check(Array1(5), "100")
-    
+
     Call ArrayReverse(Array1)
     Call Check(Array1(0), "100")
     Call Check(Array1(1), "103")
@@ -3377,10 +3575,10 @@ Public Function ArrayDimension(ByRef ArrayValue As Variant) As Long
 End Function
 
 Public Sub testArrayDimension()
-        
+
     Dim A() As String
     Call Check(0, ArrayDimension(A))
-    
+
     Dim B()
     B = Array("A", "B", "C")
     Call Check(1, ArrayDimension(B))
@@ -3388,29 +3586,65 @@ Public Sub testArrayDimension()
     Dim C() As String
     C = ArrayStr("A", "B", "C")
     Call Check(1, ArrayDimension(C))
-    
+
     Dim D() As String
     ReDim Preserve D(3, 4)
-    
+
     Call Check(2, ArrayDimension(D))
 End Sub
 
 '----------------------------------------
 '・2次元配列の列数を取得する
 '----------------------------------------
-Public Function Array2dColumnsCount(ByRef ArrayValue As Variant) As Long
-    Call Assert(IsArray(ArrayValue), "Error:Array2dSetRowValues:ArrayValue is not Array")
-    
+'   ・  0オリジン/1オリジン、両方対応
+'----------------------------------------
+Public Function Array2dColumnsStartIndex(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dColumnsStartIndex:ArrayValue is not Array")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dColumnsStartIndex:ArrayValue Dimension is miss")
+
     Dim Result As Long
-    
-    Select Case ArrayDimension(ArrayValue)
+
+    Select Case Dimension
     Case 2
-        Result = ArrayCount(ArrayValue, 1)
+        Result = LBoundNoError(ArrayValue, 1)
     Case 0
         '未定義配列
         Result = 0
-    Case Else
-        Call Assert(False, "Error:Array2dColumnsCount:ArrayValue Dimension is miss")
+    End Select
+    Array2dColumnsStartIndex = Result
+End Function
+
+Public Function Array2dColumnsEndIndex(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dColumnsEndIndex:ArrayValue is not Array")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dColumnsEndIndex:ArrayValue Dimension is miss")
+
+    Dim Result As Long
+
+    Select Case Dimension
+    Case 2
+        Result = UBoundNoError(ArrayValue, 1)
+    Case 0
+        '未定義配列
+        Result = 0
+    End Select
+    Array2dColumnsEndIndex = Result
+End Function
+
+Public Function Array2dColumnsCount(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dColumnsCount:ArrayValue is not Array")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dColumnsCount:ArrayValue Dimension is miss")
+
+    Dim Result As Long
+
+    Select Case Dimension
+    Case 2
+        Result = Array2dColumnsEndIndex(ArrayValue) - Array2dColumnsStartIndex(ArrayValue) + 1
+    Case 0
+        '未定義配列
+        Result = 0
     End Select
     Array2dColumnsCount = Result
 End Function
@@ -3418,19 +3652,55 @@ End Function
 '----------------------------------------
 '・2次元配列の行数を取得する
 '----------------------------------------
-Public Function Array2dRowsCount(ByRef ArrayValue As Variant) As Long
-    Call Assert(IsArray(ArrayValue), "Error:Array2dSetRowValues:ArrayValue is not Array.")
-    
+'   ・  0オリジン/1オリジン、両方対応
+'----------------------------------------
+Public Function Array2dRowsStartIndex(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dRowsStartIndex:ArrayValue is not Array")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dRowsStartIndex:ArrayValue Dimension is miss")
+
     Dim Result As Long
-    
-    Select Case ArrayDimension(ArrayValue)
+
+    Select Case Dimension
     Case 2
-        Result = ArrayCount(ArrayValue, 2)
+        Result = LBoundNoError(ArrayValue, 2)
     Case 0
         '未定義配列
         Result = 0
-    Case Else
-        Call Assert(False, "Error:Array2dRowsCount:ArrayValue Dimension is miss")
+    End Select
+    Array2dRowsStartIndex = Result
+End Function
+
+Public Function Array2dRowsEndIndex(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dRowsEndIndex:ArrayValue is not Array")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dRowsEndIndex:ArrayValue Dimension is miss")
+
+    Dim Result As Long
+
+    Select Case Dimension
+    Case 2
+        Result = UBoundNoError(ArrayValue, 2)
+    Case 0
+        '未定義配列
+        Result = 0
+    End Select
+    Array2dRowsEndIndex = Result
+End Function
+
+Public Function Array2dRowsCount(ByRef ArrayValue As Variant) As Long
+    Call Assert(IsArray(ArrayValue), "Error:Array2dRowsCount:ArrayValue is not Array.")
+    Dim Dimension As Long: Dimension = ArrayDimension(ArrayValue)
+    Call Assert(OrValue(Dimension, 0, 2), "Error:Array2dRowsCount:ArrayValue Dimension is miss")
+
+    Dim Result As Long
+
+    Select Case ArrayDimension(ArrayValue)
+    Case 2
+        Result = Array2dRowsEndIndex(ArrayValue) - Array2dRowsStartIndex(ArrayValue) + 1
+    Case 0
+        '未定義配列
+        Result = 0
     End Select
     Array2dRowsCount = Result
 End Function
@@ -3450,13 +3720,13 @@ End Sub
 Public Sub testArray2dSetColumn()
     Dim A() As String
     Call Array2dSetColumn(A, 5)
-    
+
     Call Check(5, ArrayCount(A, 1))
     Call Check(1, ArrayCount(A, 2))
-    
+
 '    Call Array2DSetColumn(A, 4)
     '2回実行するとエラーになる
-    
+
 End Sub
 
 
@@ -3465,6 +3735,7 @@ End Sub
 '----------------------------------------
 '   ・  列数が一致した配列を設定して行の値をセットする
 '   ・  オブジェクト値にも対応
+'   ・  0オリジン/1オリジン、両方対応
 '----------------------------------------
 Public Sub Array2dSetRowValues(ByRef ArrayValue As Variant, _
 ByVal RowIndex As Long, _
@@ -3475,10 +3746,11 @@ ByRef Values As Variant)
         "Error:Array2dSetRowValues:Values Count is miss.")
     Call Assert(InRange(LBound(ArrayValue, 2), RowIndex, UBound(ArrayValue, 2)), _
         "Error:Array2dSetRowValues:RowIndex range over.")
-        
+
     Dim I As Long
-    For I = 0 To Array2dColumnsCount(ArrayValue) - 1
-        Call SetValue(ArrayValue(I, RowIndex), Values(I))
+    Dim StartIndex As Long: StartIndex = Array2dColumnsStartIndex(ArrayValue)
+    For I = StartIndex To Array2dColumnsEndIndex(ArrayValue)
+        Call SetValue(ArrayValue(I, RowIndex), Values(I - StartIndex))
     Next
 End Sub
 
@@ -3486,6 +3758,7 @@ End Sub
 '・2次元配列の行を取得する
 '----------------------------------------
 '   ・  オブジェクト値にも対応
+'   ・  0オリジン/1オリジン、両方対応
 '----------------------------------------
 Public Function Array2dGetRowValues(ByRef ArrayValue As Variant, _
 ByVal RowIndex As Long) As String()
@@ -3493,13 +3766,15 @@ ByVal RowIndex As Long) As String()
     Call Assert(ArrayDimension(ArrayValue) = 2, "Error:Array2dSetRowValues:ArrayValue is not Array2D.")
     Call Assert(InRange(LBound(ArrayValue, 2), RowIndex, UBound(ArrayValue, 2)), _
         "Error:Array2dSetRowValues:RowIndex range over.")
-        
+
     Dim Result() As String
     Result = ArrayStr()
     ReDim Preserve Result(Array2dColumnsCount(ArrayValue) - 1)
+
     Dim I As Long
-    For I = 0 To Array2dColumnsCount(ArrayValue) - 1
-        Result(I) = ArrayValue(I, RowIndex)
+    Dim StartIndex As Long: StartIndex = Array2dColumnsStartIndex(ArrayValue)
+    For I = StartIndex To Array2dColumnsEndIndex(ArrayValue)
+        Result(I - StartIndex) = ArrayValue(I, RowIndex)
     Next
     Array2dGetRowValues = Result
 End Function
@@ -3510,6 +3785,7 @@ End Function
 '----------------------------------------
 '   ・  列数が一致した配列を設定して行の値をセットする
 '   ・  オブジェクト値にも対応
+'   ・  0オリジン/1オリジン、両方対応
 '----------------------------------------
 Public Sub Array2dSetColumnValues(ByRef ArrayValue As Variant, _
 ByVal ColumnIndex As Long, _
@@ -3520,10 +3796,11 @@ ByRef Values As Variant)
         "Error:Array2dSetColumnValues:Values Count is miss.")
     Call Assert(InRange(LBound(ArrayValue, 1), ColumnIndex, UBound(ArrayValue, 1)), _
         "Error:Array2dSetColumnValues:ColumnIndex range over.")
-        
+
     Dim I As Long
-    For I = 0 To Array2dRowsCount(ArrayValue) - 1
-        Call SetValue(ArrayValue(ColumnIndex, I), Values(I))
+    Dim StartIndex As Long: StartIndex = Array2dRowsStartIndex(ArrayValue)
+    For I = StartIndex To Array2dRowsEndIndex(ArrayValue)
+        Call SetValue(ArrayValue(ColumnIndex, I), Values(I - StartIndex))
     Next
 End Sub
 
@@ -3531,6 +3808,7 @@ End Sub
 '・2次元配列の列を取得する
 '----------------------------------------
 '   ・  オブジェクト値にも対応
+'   ・  0オリジン/1オリジン、両方対応
 '----------------------------------------
 Public Function Array2dGetColumnValues(ByRef ArrayValue As Variant, _
 ByVal ColumnIndex As Long) As String()
@@ -3538,13 +3816,14 @@ ByVal ColumnIndex As Long) As String()
     Call Assert(ArrayDimension(ArrayValue) = 2, "Error:Array2dGetColumnValues:ArrayValue is not Array2D.")
     Call Assert(InRange(LBound(ArrayValue, 1), ColumnIndex, UBound(ArrayValue, 1)), _
         "Error:Array2dGetColumnValues:ColumnIndex range over.")
-    
+
     Dim Result() As String
     Result = ArrayStr()
     ReDim Preserve Result(Array2dRowsCount(ArrayValue) - 1)
     Dim I As Long
-    For I = 0 To Array2dRowsCount(ArrayValue) - 1
-        Result(I) = ArrayValue(ColumnIndex, I)
+    Dim StartIndex As Long: StartIndex = Array2dRowsStartIndex(ArrayValue)
+    For I = StartIndex To Array2dRowsEndIndex(ArrayValue)
+        Result(I - StartIndex) = ArrayValue(ColumnIndex, I)
     Next
     Array2dGetColumnValues = Result
 End Function
@@ -3560,7 +3839,7 @@ ByRef Values As Variant)
     Call Assert(IsArray(ArrayValue), "Error:Array2dAdd:ArrayValue is not Array")
     Call Assert(IsArray(Values), "Error:Array2dAdd:Values is not Array")
     Call Assert(ArrayDimension(Values) = 1, "Error:Array2dAdd:Values Dimension is not 1")
-    
+
     Select Case ArrayDimension(ArrayValue)
     Case 2
         Call Assert(UBound(Values) - LBound(Values) + 1 = Array2dColumnsCount(ArrayValue), _
@@ -3580,25 +3859,25 @@ End Sub
 
 Public Sub testArray2dAdd()
     Dim A() As String
-    
+
     Call Check(0, ArrayCount(A, 1))
     Call Check(0, ArrayCount(A, 2))
-    
+
     Call Array2dSetColumn(A, 3)
     Call Check(3, ArrayCount(A, 1))
     Call Check(1, ArrayCount(A, 2))
-    
+
     Call Array2dSetRowValues(A, 0, Array("A", "B", "C"))
     Call Array2dAdd(A, Array("D", "E", "F"))
     Call Array2dAdd(A, Array("G", "H", "I"))
     Call Array2dAdd(A, Array("1", "2", "3"))
-    
+
     Dim B() As String
     Call Array2dAdd(B, Array("A", "B", "C"))
     Call Array2dAdd(B, Array("D", "E", "F"))
     Call Array2dAdd(B, Array("G", "H", "I"))
     Call Array2dAdd(B, Array("1", "2", "3"))
-    
+
 End Sub
 
 
@@ -3642,7 +3921,7 @@ ByVal RowIndex As Long)
         Call Array2dSetRowValues(ArrayValue, I - 1, _
             Array2dGetRowValues(ArrayValue, I))
     Next
-    
+
     If LBound(ArrayValue, 2) = UBound(ArrayValue, 2) Then
         Erase ArrayValue
         '配列の初期化はEraseを使う
@@ -3656,11 +3935,11 @@ Public Sub testArray2dBasicFunction()
     Dim A()
     Call Check(0, ArrayCount(A, 1))
     Call Check(0, ArrayCount(A, 2))
-    
+
     Call Array2dSetColumn(A, 3)
     Call Check(3, ArrayCount(A, 1))
     Call Check(1, ArrayCount(A, 2))
-    
+
     Call Array2dSetRowValues(A, 0, Array("A", "B", "C"))
     Call Array2dAdd(A, Array("D", "E", "F"))
     Call Array2dAdd(A, Array("G", "H", "I"))
@@ -3674,7 +3953,7 @@ Public Sub testArray2dBasicFunction()
     Call Check("1,2,3", ArrayToString(Array2dGetRowValues(A, 3), ","))
     Call Check(3, Array2dColumnsCount(A))
     Call Check(4, Array2dRowsCount(A))
-    
+
     Call Array2dInsert(A, 3, B)
     Call Check("A,B,C", ArrayToString(Array2dGetRowValues(A, 0), ","))
     Call Check("D,E,F", ArrayToString(Array2dGetRowValues(A, 1), ","))
@@ -3683,7 +3962,7 @@ Public Sub testArray2dBasicFunction()
     Call Check("1,2,3", ArrayToString(Array2dGetRowValues(A, 4), ","))
     Call Check(3, Array2dColumnsCount(A))
     Call Check(5, Array2dRowsCount(A))
-    
+
     Call Array2dDelete(A, 0)
     Call Check("D,E,F", ArrayToString(Array2dGetRowValues(A, 0), ","))
     Call Check("G,H,I", ArrayToString(Array2dGetRowValues(A, 1), ","))
@@ -3713,7 +3992,7 @@ ByVal ColumnIndex As Long) As Boolean
     Call Assert(IsArray(ArrayValue), "Error:ArrayIsUnique:ArrayValue is not array")
     Call Assert(ArrayDimension(ArrayValue) = 2, _
         "Error:Array2dIsUnique:ArrayValue Dimension is miss")
-    
+
     Dim Result As Boolean: Result = True
     Do
         If OrValue(Array2dRowsCount(ArrayValue), 0, 1) Then Exit Do
@@ -3735,7 +4014,7 @@ End Function
 Sub testArray2dIsUnique()
     Dim A()
     Call Array2dSetColumn(A, 3)
-    
+
     Call Array2dSetRowValues(A, 0, Array("A", "B", "C"))
     Call Array2dAdd(A, Array("D", "E", "C"))
     Call Array2dAdd(A, Array("G", "H", "C"))
@@ -3762,22 +4041,22 @@ Optional ByVal RowIndexMin As Long = -1, Optional ByVal RowIndexMax As Long = -1
         "Error:Array2dSortQuick:ArrayValue Dimension is miss.")
     Call Assert(InRange(LBound(ArrayValue, 1), ColumnIndex, UBound(ArrayValue, 1)), _
         "Error:Array2dSortQuick:ColumnIndex is range over.")
-    
+
     Call Assert(RowIndexMin <= RowIndexMax, "Error:IndexMin < IndexMax")
     Call Assert(InRange(-1, RowIndexMin, Array2dRowsCount(ArrayValue) - 1), _
         "Error:ArrayReverse:RowIndexMin Range is miss.")
     Call Assert(InRange(-1, RowIndexMax, Array2dRowsCount(ArrayValue) - 1), _
         "Error:ArrayReverse:RowIndexMax Range is miss.")
-    
+
     '1以下ならソート不可能なのでExitする
     If Array2dRowsCount(ArrayValue) <= 1 Then Exit Sub
-    
-    RowIndexMin = IIf(RowIndexMin = -1, 0, RowIndexMin)
-    RowIndexMax = IIf(RowIndexMax = -1, Array2dRowsCount(ArrayValue) - 1, RowIndexMax)
-    
+
+    RowIndexMin = IIf(RowIndexMin = -1, LBoundNoError(ArrayValue, 2), RowIndexMin)
+    RowIndexMax = IIf(RowIndexMax = -1, UBoundNoError(ArrayValue, 2), RowIndexMax)
+
     'IndexMin=IndexMaxならソート不可能なのでExit
     If RowIndexMin = RowIndexMax Then Exit Sub
-    
+
     Call Array2dSortQuickBase(ArrayValue, ColumnIndex, SortOrder, RowIndexMin, RowIndexMax)
 End Sub
 
@@ -3786,33 +4065,38 @@ Sub Array2dSortQuickBase(ByRef ArrayValue As Variant, _
 ByVal ColumnIndex As Long, _
 ByVal SortOrder As SortOrder, _
 ByVal RowIndexMin As Long, ByVal RowIndexMax As Long)
-    
+
     Dim RowIndexCenter As Long
     Dim RowIndex1 As Long
     Dim RowIndex2 As Long
     Dim RowValue1 As Variant
     Dim RowValue2 As Variant
-    
+
     If RowIndexMax <= RowIndexMin Then Exit Sub
+
+    Dim RowOrigin As Long
+    Dim ColOrigin As Long
+    RowOrigin = LBoundNoError(ArrayValue, 2)
+    ColOrigin = LBoundNoError(ArrayValue, 1)
     
     RowIndexCenter = (RowIndexMin + RowIndexMax) \ 2
-    
+
     '中央値をバッファ
     RowValue1 = Array2dGetRowValues(ArrayValue, RowIndexCenter)
     '中央値に開始位置要素を代入
     Call Array2dSetRowValues(ArrayValue, RowIndexCenter, _
         Array2dGetRowValues(ArrayValue, RowIndexMin))
-    
+
     RowIndex2 = RowIndexMin
-    
+
     RowIndex1 = RowIndexMin + 1
-    
+
     Select Case SortOrder
     Case Ascending
         Do While RowIndex1 <= RowIndexMax
-            If ArrayValue(ColumnIndex, RowIndex1) < RowValue1(ColumnIndex) Then
+            If ArrayValue(ColumnIndex, RowIndex1) < RowValue1(ColumnIndex - ColOrigin) Then
                 RowIndex2 = RowIndex2 + 1
-                
+
                 RowValue2 = Array2dGetRowValues(ArrayValue, RowIndex2)
                 Call Array2dSetRowValues(ArrayValue, RowIndex2, _
                     Array2dGetRowValues(ArrayValue, RowIndex1))
@@ -3822,9 +4106,9 @@ ByVal RowIndexMin As Long, ByVal RowIndexMax As Long)
         Loop
     Case Descending
         Do While RowIndex1 <= RowIndexMax
-            If RowValue1(ColumnIndex) < ArrayValue(ColumnIndex, RowIndex1) Then
+            If RowValue1(ColumnIndex - ColOrigin) < ArrayValue(ColumnIndex, RowIndex1) Then
                 RowIndex2 = RowIndex2 + 1
-                
+
                 RowValue2 = Array2dGetRowValues(ArrayValue, RowIndex2)
                 Call Array2dSetRowValues(ArrayValue, RowIndex2, _
                     Array2dGetRowValues(ArrayValue, RowIndex1))
@@ -3835,11 +4119,11 @@ ByVal RowIndexMin As Long, ByVal RowIndexMax As Long)
     Case Else
         Call Assert(False, "Error:Array2dSortQuickBase:SortOrder is miss.")
     End Select
-    
+
     Call Array2dSetRowValues(ArrayValue, RowIndexMin, _
         Array2dGetRowValues(ArrayValue, RowIndex2))
     Call Array2dSetRowValues(ArrayValue, RowIndex2, RowValue1)
-    
+
     ' 分割前半を再帰呼び出しでSORT
     Call Array2dSortQuickBase(ArrayValue, ColumnIndex, SortOrder, RowIndexMin, RowIndex2 - 1)
 
@@ -3925,6 +4209,43 @@ Sub testArray2dSortQuick()
     Call Check(Array1(1, 4), "102")
     Call Check(Array1(1, 5), "105")
     'キー項目に対してソートするときれいな結果になる
+    
+    
+    '1開始の動的配列での動作確認
+    Dim Array2(1 To 3, 1 To 6) As String
+    Array2(1, 1) = "A1"
+    Array2(1, 2) = "A2"
+    Array2(1, 3) = "A3"
+    Array2(1, 4) = "A1"
+    Array2(1, 5) = "A2"
+    Array2(1, 6) = "A3"
+    Array2(2, 1) = "100"
+    Array2(2, 2) = "101"
+    Array2(2, 3) = "102"
+    Array2(2, 4) = "103"
+    Array2(2, 5) = "104"
+    Array2(2, 6) = "105"
+
+    'クイックソートのためのキー項目作成
+    For I = LBoundNoError(Array2, 2) To UBoundNoError(Array2, 2)
+        Array2(3, I) = Array2(1, I) + CStr(Array2(2, I))
+    Next
+    
+    Call Array2dSortQuick(Array2, 3)
+    Call Check(Array2(1, 1), "A1")
+    Call Check(Array2(1, 2), "A1")
+    Call Check(Array2(1, 3), "A2")
+    Call Check(Array2(1, 4), "A2")
+    Call Check(Array2(1, 5), "A3")
+    Call Check(Array2(1, 6), "A3")
+    Call Check(Array2(2, 1), "100")
+    Call Check(Array2(2, 2), "103")
+    Call Check(Array2(2, 3), "101")
+    Call Check(Array2(2, 4), "104")
+    Call Check(Array2(2, 5), "102")
+    Call Check(Array2(2, 6), "105")
+    
+    
 End Sub
 
 '----------------------------------------
@@ -3942,7 +4263,7 @@ Optional ByVal SortOrder As SortOrder = SortOrder.Ascending)
 
     Dim DigitArrayRowsCount As Long
     Dim DigitStrLength As Long
-    
+
     Dim Delimiter As String
     Delimiter = ""
 
@@ -3951,7 +4272,7 @@ Optional ByVal SortOrder As SortOrder = SortOrder.Ascending)
         ColumnIndex, FirstAdd, Delimiter, True, DigitStrLength, DigitArrayRowsCount, SortOrder)
 
     Call Array2dSortQuick(ArrayValue, ColumnIndex, Ascending)
-    
+
     'ソートキー文字列の削除
     Dim I As Long
     For I = 0 To Array2dRowsCount(ArrayValue) - 1
@@ -3982,13 +4303,13 @@ ByVal SortOrder As SortOrder)
     Out_DigitStrLength = 0
     Dim MaxLength As Long
     MaxLength = 0
-    
+
     Dim I As Long
     For I = 0 To Array2dRowsCount(ArrayValue) - 1
         MaxLength = MaxValue(MaxLength, Len(ArrayValue(ColumnIndex, I)))
     Next
     Out_DigitStrLength = Len(CStr(MaxLength))
-    
+
     Select Case SortOrder
     Case Ascending
         Select Case KeyAddType
@@ -4033,7 +4354,7 @@ End Sub
 
 Public Sub testArray2dSortStrLength()
     Dim A()
-    
+
     Call Array2dAdd(A, Array("A", "B", "C", "123"))
     Call Array2dAdd(A, Array("D", "E", "F", "12"))
     Call Array2dAdd(A, Array("G", "H", "I", "1"))
@@ -4042,14 +4363,14 @@ Public Sub testArray2dSortStrLength()
     Call Array2dAdd(A, Array("7", "8", "9", "333"))
 
     Call Array2dSortStrLength(A, 3, Ascending)
-    
+
     Call Check("G,H,I,1", ArrayToString(Array2dGetRowValues(A, 0), ","))
     Call Check("1,2,3,1", ArrayToString(Array2dGetRowValues(A, 1), ","))
     Call Check("D,E,F,12", ArrayToString(Array2dGetRowValues(A, 2), ","))
     Call Check("4,5,6,22", ArrayToString(Array2dGetRowValues(A, 3), ","))
     Call Check("A,B,C,123", ArrayToString(Array2dGetRowValues(A, 4), ","))
     Call Check("7,8,9,333", ArrayToString(Array2dGetRowValues(A, 5), ","))
-    
+
     Erase A
     Call Array2dAdd(A, Array("A", "B", "C", "123"))
     Call Array2dAdd(A, Array("D", "E", "F", "12"))
@@ -4089,7 +4410,7 @@ Optional NoOrderValuePriority As Boolean = False)
 
     Dim DigitArrayRowsCount As Long
     Dim DigitOrderCount As Long
-    
+
     Dim Delimiter As String
     Delimiter = ""
 
@@ -4099,10 +4420,11 @@ Optional NoOrderValuePriority As Boolean = False)
         OrderArrayWildCard, CaseCompare, NoOrderValuePriority)
 
     Call Array2dSortQuick(ArrayValue, ColumnIndex, Ascending)
-    
+
     'ソートキー文字列の削除
     Dim I As Long
-    For I = 0 To Array2dRowsCount(ArrayValue) - 1
+    Dim StartIndex As Long: StartIndex = Array2dRowsStartIndex(ArrayValue)
+    For I = StartIndex To Array2dRowsEndIndex(ArrayValue)
         ArrayValue(ColumnIndex, I) = _
             Mid$(ArrayValue(ColumnIndex, I), _
                 DigitOrderCount + DigitArrayRowsCount + Len(Delimiter) + 1)
@@ -4134,11 +4456,13 @@ Optional NoOrderValuePriority As Boolean = False)
     Out_DigitOrderCount = Len(CStr(ArrayCount(OrderArrayWildCard) + 1))
 
     Dim I As Long
+    Dim StartIndex As Long: StartIndex = Array2dRowsStartIndex(ArrayValue)
+
     Dim OrderArrayIndex As Long
-    
+
     Select Case KeyAddType
     Case FirstAdd
-        For I = 0 To Array2dRowsCount(ArrayValue) - 1
+        For I = StartIndex To Array2dRowsEndIndex(ArrayValue)
             OrderArrayIndex = _
                 ArrayIndexOf(OrderArrayWildCard, ArrayValue(ColumnIndex, I), , CaseCompare, WildCardArray)
             If OrderArrayIndex = -1 Then
@@ -4196,7 +4520,7 @@ End Sub
 
 Public Sub testArray2dSortCustomOrder()
     Dim A()
-    
+
     Call Array2dAdd(A, Array("01", "02", "03", "b"))
     Call Array2dAdd(A, Array("04", "05", "06", "a"))
     Call Array2dAdd(A, Array("07", "08", "09", "s"))
@@ -4207,7 +4531,7 @@ Public Sub testArray2dSortCustomOrder()
 
     Call Array2dSortCustomOrder(A, 3, _
         ArrayStr("ss*", "s*", "m*", "l*", "ll*"), CaseSensitive, False)
-    
+
     Call Check("11,12,13,ss", ArrayToString(Array2dGetRowValues(A, 0), ","))
     Call Check("07,08,09,s", ArrayToString(Array2dGetRowValues(A, 1), ","))
     Call Check("21,22,23,m", ArrayToString(Array2dGetRowValues(A, 2), ","))
@@ -4215,9 +4539,9 @@ Public Sub testArray2dSortCustomOrder()
     Call Check("17,18,19,ll", ArrayToString(Array2dGetRowValues(A, 4), ","))
     Call Check("01,02,03,b", ArrayToString(Array2dGetRowValues(A, 5), ","))
     Call Check("04,05,06,a", ArrayToString(Array2dGetRowValues(A, 6), ","))
-    
+
     Erase A
-    
+
     Call Array2dAdd(A, Array("01", "02", "03", "b"))
     Call Array2dAdd(A, Array("04", "05", "06", "a"))
     Call Array2dAdd(A, Array("07", "08", "09", "s"))
@@ -4228,7 +4552,7 @@ Public Sub testArray2dSortCustomOrder()
 
     Call Array2dSortCustomOrder(A, 3, _
         ArrayStr("ss*", "s*", "m*", "l*", "ll*"), CaseSensitive, True)
-    
+
     Call Check("01,02,03,b", ArrayToString(Array2dGetRowValues(A, 0), ","))
     Call Check("04,05,06,a", ArrayToString(Array2dGetRowValues(A, 1), ","))
     Call Check("11,12,13,ss", ArrayToString(Array2dGetRowValues(A, 2), ","))
@@ -4236,10 +4560,56 @@ Public Sub testArray2dSortCustomOrder()
     Call Check("21,22,23,m", ArrayToString(Array2dGetRowValues(A, 4), ","))
     Call Check("14,15,16,l", ArrayToString(Array2dGetRowValues(A, 5), ","))
     Call Check("17,18,19,ll", ArrayToString(Array2dGetRowValues(A, 6), ","))
-    
-    
 
 End Sub
+
+'----------------------------------------
+'・シートRangeに対応した 独自並び順ソート
+'----------------------------------------
+Public Sub SheetRangeSortCustomOrder(ByRef Sheet As Worksheet, _
+ByVal Range As Range, _
+ByVal ColumnIndex As Long, _
+ByRef OrderArrayWildCard() As String, _
+Optional CaseCompare As CaseCompare = CaseCompare.IgnoreCase, _
+Optional NoOrderValuePriority As Boolean = False)
+    
+    Dim Array2D As Variant
+    Array2D = Range
+    
+    Array2D = Array2dTranspose(Array2D)
+    
+    Call Array2dSortCustomOrder(Array2D, ColumnIndex, OrderArrayWildCard, _
+        CaseCompare, NoOrderValuePriority)
+
+    Array2D = Array2dTranspose(Array2D)
+    
+    Range = Array2D
+End Sub
+
+Private Function Array2dTranspose(ByRef ArrayValue As Variant) As Variant
+
+    Call Assert(IsArray(ArrayValue), "Error:ArrayValue is not Array")
+    Call Assert(ArrayDimension(ArrayValue) = 2, _
+        "Error:Array2dSortCustomOrderSetKeyValue:ArrayValue Dimension is miss.")
+
+    Dim LBound1 As Long: LBound1 = LBoundNoError(ArrayValue, 1)
+    Dim UBound1 As Long: UBound1 = UBoundNoError(ArrayValue, 1)
+    Dim LBound2 As Long: LBound2 = LBoundNoError(ArrayValue, 2)
+    Dim UBound2 As Long: UBound2 = UBoundNoError(ArrayValue, 2)
+ 
+    Dim Result As Variant
+    ReDim Result(LBound2 To UBound2, LBound1 To UBound1)
+    Dim I As Long
+    For I = LBound1 To UBound1
+        Dim J As Long
+        For J = LBound2 To UBound2
+            Result(J, I) = ArrayValue(I, J)
+        Next J
+    Next I
+    
+    Array2dTranspose = Result
+End Function
+
 
 '----------------------------------------
 '◆ファイル名処理
@@ -4262,6 +4632,8 @@ End Function
 '----------------------------------------
 '・ドライブパス"C:"を取り出す関数
 '----------------------------------------
+'   ・  [C:]という文字列が取得できる
+'----------------------------------------
 Public Function GetDrivePath(ByVal Path As String) As String
     GetDrivePath = IncludeLastStr( _
         FirstStrFirstDelim(Path, ":"), ":")
@@ -4271,8 +4643,8 @@ End Function
 '・ドライブパスが含まれているかどうか確認する関数
 '[:]が2文字目以降にあるかどうかで判定
 '----------------------------------------
-Public Function IsDrivePath(ByVal Path As String) As String
-    Dim Result As String
+Public Function IsDrivePath(ByVal Path As String) As Boolean
+    Dim Result As Boolean
     Result = (OrValue(InStr(Path, ":"), 2, 3))
     IsDrivePath = Result
 End Function
@@ -4280,8 +4652,8 @@ End Function
 '----------------------------------------
 '・ネットワークドライブかどうか確認する関数
 '----------------------------------------
-Public Function IsNetworkPath(ByVal Path As String) As String
-    Dim Result As String: Result = False
+Public Function IsNetworkPath(ByVal Path As String) As Boolean
+    Dim Result As Boolean: Result = False
     If IsFirstStr(Path, "\\") Then
         If 3 <= Len(Path) Then
             Result = True
@@ -4490,30 +4862,64 @@ End Function
 '----------------------------------------
 '・相対パスから絶対パス取得
 '----------------------------------------
+'   ・  ドライブパスとネットワークパスの場合をわけて
+'       ドライブパスの場合は ChDrive と ChDir を組み合わせて
+'       実装していたが、そんな必要もなく
+'       Shellオブジェクトを使う方が楽に設定できる。
+'----------------------------------------
 Public Function AbsolutePath(ByVal BasePath As String, _
 ByVal RelativePath As String) As String
     Dim CurDirBuffer As String
-    CurDirBuffer = CurDir
+    CurDirBuffer = Shell.CurrentDirectory
 
     Call Assert(fso.FolderExists(BasePath) Or fso.FileExists(BasePath), _
         "Error:AbsolutePath")
-    Call Assert(IsDrivePath(BasePath), "Error:AbsolutePath")
+        
+    Call Assert(IsDrivePath(BasePath) Or IsNetworkPath(BasePath), _
+        "Error:AbsolutePath")
 
-    'カレントドライブ/ディレクトリをBasePathに合わせる
-    Call ChDrive(ExcludeLastStr(BasePath, ":\"))
-    Call ChDir(BasePath)
-
-    '相対パスRelativePathでカレントディレクトリを設定する
-
-    AbsolutePath = fso.GetAbsolutePathName(RelativePath)
-
-    'バッファしていた値でカレントドライブ/ディレクトリを設定する
-    Call ChDrive(ExcludeLastStr(CurDirBuffer, ":\"))
-    Call ChDir(CurDirBuffer)
+    Shell.CurrentDirectory = BasePath
+    AbsolutePath = TrimLastSpace(fso.GetAbsolutePathName(RelativePath))
+    '終端に改行コードが含まれる場合があるので削除する
+    Shell.CurrentDirectory = CurDirBuffer
+    
 End Function
 
 Private Sub testAbsolutePath()
-    Call Check("C:\Program Files", AbsolutePath("C:\", "..\Program Files"))
+    Shell.CurrentDirectory = "C:\Program Files"
+
+    Call Check("C:\Program Files", AbsolutePath("C:\", ".\Program Files"))
+    Call Check("C:\", AbsolutePath("C:\Program Files", "..\"))
+    Call Check("C:\Windows", AbsolutePath("C:\", ".\Program Files\..\Windows"))
+
+    'ネットワークパスの場合、大小文字が一致しない時がある
+    Call Check(LCase("\\vmware-host\Shared Folders\この Mac 上の satoshi_yamamoto\MyFolder\MyData"), _
+        LCase(AbsolutePath("\\vmware-host\Shared Folders\この Mac 上の satoshi_yamamoto\MyFolder", ".\MyData")))
+
+    '"C:\Program Files (x86)\Microsoft Office\root\Office16\EXCEL.EXE"
+    Call Check("C:\Program Files (x86)\Google\Chrome", AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "..\..\..\Google\Chrome"))
+    
+    '存在しないフォルダでも相対アドレスで指定できた
+    Call Check("C:\Program Files (x86)\abc\def", AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "..\..\..\abc\def"))
+    
+    '先頭にピリオドがなくても指定できる
+    Call Check("C:\Program Files (x86)\Microsoft Office\root\Office16\abc\def", _
+        AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "abc\def"))
+
+
+    
+    Shell.CurrentDirectory = "\\vmware-host\Shared Folders"
+    
+    Call Check("C:\Program Files", AbsolutePath("C:\", ".\Program Files"))
+    Call Check("C:\", AbsolutePath("C:\Program Files", "..\"))
+    Call Check("C:\Windows", AbsolutePath("C:\", ".\Program Files\..\Windows"))
+    Call Check(LCase("\\vmware-host\Shared Folders\この Mac 上の satoshi_yamamoto\MyFolder\MyData"), _
+        LCase(AbsolutePath("\\vmware-host\Shared Folders\この Mac 上の satoshi_yamamoto\MyFolder", ".\MyData")))
+    Call Check("C:\Program Files (x86)\Google\Chrome", AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "..\..\..\Google\Chrome"))
+    Call Check("C:\Program Files (x86)\abc\def", AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "..\..\..\abc\def"))
+    Call Check("C:\Program Files (x86)\Microsoft Office\root\Office16\abc\def", _
+        AbsolutePath("C:\Program Files (x86)\Microsoft Office\root\Office16", "abc\def"))
+
 End Sub
 
 '----------------------------------------
@@ -4525,19 +4931,19 @@ Public Function SettingFullPath( _
 ByVal SettingPath As String, _
 Optional ByVal BasePath As String = "") As String
     Dim Result As String
-    
+
     If SettingPath = "" Then
         Result = ThisWorkbook.Path
     Else
         If BasePath = "" Then BasePath = ThisWorkbook.Path
-        
+
         If IsDrivePath(BasePath) Then
             'ファイルダイアログを開いた後
             'カレントディレクトリが変になる場合があるので
             'カレントディレクトリをリセットする
             Call ChDrive(ExcludeLastStr(BasePath, ":\"))
             Call ChDir(BasePath)
-        
+
             Result = AbsolutePath(BasePath, SettingPath)
         Else
             Result = SettingPath
@@ -4580,6 +4986,100 @@ End Function
 
 
 '----------------------------------------
+'◇空フォルダの削除
+'----------------------------------------
+
+'----------------------------------------
+'・ 指定したフォルダにファイルや下位フォルダがない場合は削除する関数
+'----------------------------------------
+Public Sub Folder_DeleteIfNoFile( _
+ByVal FolderPath As String)
+
+    If Folder_HasSubItem(FolderPath) = False Then
+        Call fso.DeleteFolder(FolderPath)
+    End If
+
+End Sub
+
+'----------------------------------------
+'・ 指定したフォルダにファイルや下位フォルダがない場合は削除し
+'   さらに上位フォルダを見て下位が無い場合は削除していく関数
+'----------------------------------------
+Public Sub Folder_DeleteIfNoFileToUpFolder( _
+ByVal FolderPath As String, _
+Optional BaseFolderPath As String = "")
+
+    Do
+        If BaseFolderPath = FolderPath Then
+            Exit Do
+        End If
+        Call Folder_DeleteIfNoFile(FolderPath)
+        If fso.FolderExists(FolderPath) = False Then
+            FolderPath = fso.GetParentFolderName(FolderPath)
+        Else
+            Exit Do
+        End If
+    Loop While True
+
+End Sub
+
+
+'----------------------------------------
+'◇子項目関連処理
+'----------------------------------------
+
+'----------------------------------------
+'・ 指定したフォルダのファイルや下位フォルダの有無を調べる関数
+'----------------------------------------
+Public Function Folder_HasSubItem( _
+ByVal FolderPath As String) As Boolean
+
+    Dim Result As Boolean: Result = True
+    Call Assert(fso.FolderExists(FolderPath), "Error:Folder_HasSubItem")
+    
+    If FilePathListTopFolder(FolderPath) = "" Then
+        If FolderPathListTopFolder(FolderPath) = "" Then
+            Result = False
+        End If
+    End If
+    
+    Folder_HasSubItem = Result
+End Function
+
+'----------------------------------------
+'・ 指定したフォルダにファイルや下位フォルダがある場合は削除する関数
+'----------------------------------------
+'   ・  戻り値、成功=True/失敗=False
+'----------------------------------------
+Public Function Folder_DeleteSubItem( _
+ByVal FolderPath As String) As Boolean
+
+On Error GoTo ErrorLabel
+    Call Assert(fso.FolderExists(FolderPath), "Error:Folder_HasSubItem")
+    
+    Dim I As Long
+    
+    Dim FileList() As String
+    FileList = Split(FilePathListTopFolder(FolderPath), vbCrLf)
+    For I = 0 To ArrayCount(FileList) - 1
+        Call fso.DeleteFile(FileList(I))
+    Next
+    
+    Dim FolderList() As String
+    FolderList = Split(FolderPathListTopFolder(FolderPath), vbCrLf)
+
+    For I = 0 To ArrayCount(FolderList) - 1
+        Call fso.DeleteFolder(FolderList(I), True)
+    Next
+    
+    Folder_DeleteSubItem = True
+    Exit Function
+ErrorLabel:
+    Folder_DeleteSubItem = False
+End Function
+
+
+'----------------------------------------
 '◇Force/Recrate
 '----------------------------------------
 
@@ -4591,10 +5091,9 @@ Public Sub ForceCreateFolder(ByVal FolderPath As String)
     ParentFolderPath = fso.GetParentFolderName(FolderPath)
     If fso.FolderExists(ParentFolderPath) = False Then
         Call ForceCreateFolder(ParentFolderPath)
-    Else
-        If fso.FolderExists(FolderPath) = False Then
-            Call fso.CreateFolder(FolderPath)
-        End If
+    End If
+    If fso.FolderExists(FolderPath) = False Then
+        Call fso.CreateFolder(FolderPath)
     End If
 End Sub
 
@@ -4617,8 +5116,6 @@ ByVal FolderPath As String)
     Loop Until fso.FolderExists(FolderPath)
     'フォルダが作成できるまでループ
 End Sub
-
-
 
 '----------------------------------------
 '◆ファイルフォルダ列挙
@@ -5024,7 +5521,8 @@ End Sub
 Public Function CheckEncodeName(EncodeName As String) As Boolean
     CheckEncodeName = OrValue(UCase$(EncodeName), _
         "SHIFT_JIS", _
-        "UNICODE", "UNICODEFFFE", "UTF-16LE", "UTF-16", _
+        "UNICODE", "UNICODEFFFE", "UTF-16", _
+        "UTF-16LE", _
         "UNICODEFEFF", _
         "UTF-16BE", _
         "UTF-8", _
@@ -5065,12 +5563,6 @@ ByVal TextFilePath As String, ByVal EncodeName As String) As String
     ADOStream_LoadTextFile = ADOStream.ReadText
     ADOStream.Close
 End Function
-
-Private Sub testADOStream_LoadTextFile()
-    MsgBox ADOStream_LoadTextFile( _
-        ThisWorkbook.Path + "\test.ini", _
-        "UTF-16LE")
-End Sub
 
 '----------------------------------------
 '・テキストファイル保存
@@ -5130,11 +5622,279 @@ Optional ByVal BOM As Boolean = True)
     ADOStream.Close
 End Sub
 
-Private Sub testADOStream_SaveTextFile()
-    Call ADOStream_SaveTextFile( _
-        "[Option]" + vbCrLf + "Name = TestValue02", _
-        ThisWorkbook.Path + "\test.ini", _
-        "UTF-16LE", False)
+'----------------------------------------
+'◇テキストファイル読み書き Enum指定版
+'----------------------------------------
+'   ・  ADODB.Stream が許容する文字列は次の通り
+'           使用可能文字列                  エンコード
+'           SHIFT_JIS
+'           UNICODEFFFE/UNICODE/UTF-16      UTF-16LE_BOM_ON
+'           UTF-16LE                        UTF-16LE_BOM_OFF
+'           UNICODEFEFF                     UTF-16BE_BOM_ON
+'           UTF-16BE                        UTF-16BE_BOM_OFF
+'           UTF-8
+'           ISO-2022-JP
+'           EUC-JP
+'           UTF-7
+'       このうち、変わった挙動をするのは UTF-16LE と UFT-8
+'       UTF-16LEは、読み込み時に指定すると
+'       テキストファイルが UTF-16LE のBOMありなし関わらず読み込み可能
+'       これはいいのだが、書き込み時に UTF-16LE を指定しても
+'       BOMありとして書き込まれてしまうので
+'       String_SaveToFile ではBOMを除外する処理をしている。
+'       UFT-8は、常にBOMありとして書き込まれるので
+'       (もちろんそのほうがいい
+'        BOM無しのUTF-8なんて世の中に存在しない方がいいのだが)
+'       ADODB.Stream は許容しないのだが UFT-8N という文字列によって
+'       UTF-8のBOMなしの文字として表現している。
+'----------------------------------------
+Public Function GetEncodingTypeJpCharCode( _
+ByVal EncodingTypeName As String) As EncodingTypeJpCharCode
+    
+    Dim Result As EncodingTypeJpCharCode
+    Result = EncodingTypeJpCharCode.NONE
+    Select Case UCase(EncodingTypeName)
+    Case "SHIFT_JIS"
+        Result = EncodingTypeJpCharCode.Shift_JIS
+    
+    Case "UNICODE", "UNICODEFFFE", "UTF-16"
+        Result = EncodingTypeJpCharCode.UTF16_LE_BOM
+    Case "UTF-16LE"
+        Result = EncodingTypeJpCharCode.UTF16_LE_BOM_NO
+    
+    Case "UNICODEFEFF"
+        Result = EncodingTypeJpCharCode.UTF16_BE_BOM
+    Case "UTF-16BE"
+        Result = EncodingTypeJpCharCode.UTF16_BE_BOM_NO
+    
+    Case "UTF-8"
+        Result = EncodingTypeJpCharCode.UTF8_BOM
+    Case "UTF-8N"
+        Result = EncodingTypeJpCharCode.UTF8_BOM_NO
+    
+    Case "ISO-2022-JP"
+        Result = EncodingTypeJpCharCode.JIS
+        
+    Case "EUC-JP"
+        Result = EncodingTypeJpCharCode.EUC_JP
+    
+    Case "UTF-7"
+        Result = EncodingTypeJpCharCode.UTF_7
+    
+    End Select
+    
+End Function
+
+
+Public Function GetEncodingTypeName( _
+ByVal EncodingType As EncodingTypeJpCharCode) As String
+    Dim Result As String: Result = ""
+    
+    Select Case EncodingType
+    Case EncodingTypeJpCharCode.Shift_JIS
+        Result = "SHIFT_JIS"
+    
+    Case EncodingTypeJpCharCode.UTF16_LE_BOM
+        Result = "UNICODEFFFE"
+    Case EncodingTypeJpCharCode.UTF16_LE_BOM_NO
+        Result = "UTF-16LE"
+    
+    Case EncodingTypeJpCharCode.UTF16_BE_BOM
+        Result = "UNICODEFEFF"
+    Case EncodingTypeJpCharCode.UTF16_BE_BOM_NO
+        Result = "UTF-16BE"
+    
+    Case EncodingTypeJpCharCode.UTF8_BOM
+        Result = "UTF-8"
+    Case EncodingTypeJpCharCode.UTF8_BOM_NO
+        Result = "UTF-8N"
+    
+    Case EncodingTypeJpCharCode.JIS
+        Result = "ISO-2022-JP"
+        
+    Case EncodingTypeJpCharCode.EUC_JP
+        Result = "EUC-JP"
+    
+    Case EncodingTypeJpCharCode.UTF_7
+        Result = "UTF-7"
+    
+    End Select
+    GetEncodingTypeName = Result
+End Function
+
+Public Function String_LoadFromFile( _
+ByVal FilePath As String, _
+ByVal EncodingType As EncodingTypeJpCharCode) As String
+
+    Dim EncordingName As String
+    EncordingName = GetEncodingTypeName(EncodingType)
+    Call Assert(EncordingName <> "", "Error:Encoding No Select")
+
+    Dim Stream As New ADODB.Stream
+    Stream.Type = adTypeText
+    Select Case EncodingType
+    Case EncodingTypeJpCharCode.UTF8_BOM_NO
+        Stream.Charset = GetEncodingTypeName(EncodingTypeJpCharCode.UTF8_BOM)
+    Case Else
+        Stream.Charset = EncordingName
+    End Select
+    Stream.Open
+    Stream.LoadFromFile (FilePath)
+    String_LoadFromFile = Stream.ReadText
+    Stream.Close
+   
+End Function
+
+Private Sub testString_LoadFromFile()
+    Dim FolderPath As String
+    FolderPath = PathCombine( _
+        ThisWorkbook.Path, "Test", "ADOStream")
+    Call ForceCreateFolder(FolderPath)
+
+    Call Assert("Shift-JIS ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_Shift-JIS.txt"), _
+            EncodingTypeJpCharCode.Shift_JIS))
+
+    Call Assert("UTF-16LE-BOM ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-16LE-BOM.txt"), _
+            EncodingTypeJpCharCode.UTF16_LE_BOM))
+    Call Assert("UTF-16LE-BOM-NO ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-16LE-BOM-NO.txt"), _
+            EncodingTypeJpCharCode.UTF16_LE_BOM_NO))
+    
+    Call Assert("UTF-16BE-BOM ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-16BE-BOM.txt"), _
+            EncodingTypeJpCharCode.UTF16_BE_BOM))
+    Call Assert("UTF-16BE-BOM-NO ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-16BE-BOM-NO.txt"), _
+            EncodingTypeJpCharCode.UTF16_BE_BOM_NO))
+        
+    Call Assert("UTF-8-BOM ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-8-BOM.txt"), _
+            EncodingTypeJpCharCode.UTF8_BOM))
+    Call Assert("UTF-8-BOM-NO ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-8-BOM-NO.txt"), _
+            EncodingTypeJpCharCode.UTF8_BOM_NO))
+            
+    Call Assert("JIS ISO-2022-JP ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_JIS.txt"), _
+            EncodingTypeJpCharCode.JIS))
+        
+    Call Assert("EUC-JP ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_EUC-JP.txt"), _
+            EncodingTypeJpCharCode.EUC_JP))
+        
+    Call Assert("UTF-7 ＡＢＣ１２３" = _
+        String_LoadFromFile( _
+            PathCombine(FolderPath, "test_UTF-7.txt"), _
+            EncodingTypeJpCharCode.UTF_7))
+End Sub
+
+Public Sub String_SaveToFile( _
+ByVal Text As String, _
+ByVal FilePath As String, _
+ByVal EncodingType As EncodingTypeJpCharCode)
+
+    Dim EncordingName As String
+    EncordingName = GetEncodingTypeName(EncodingType)
+    Call Assert(EncordingName <> "", "Error:Encoding No Select")
+
+    Dim Stream As New ADODB.Stream
+    Stream.Type = adTypeText
+    Select Case EncodingType
+    Case EncodingTypeJpCharCode.UTF8_BOM_NO
+        Stream.Charset = GetEncodingTypeName(EncodingTypeJpCharCode.UTF8_BOM)
+    Case Else
+        Stream.Charset = EncordingName
+    End Select
+    Stream.Open
+    Call Stream.WriteText(Text)
+
+    Dim ByteData() As Byte
+    Select Case EncodingType
+    Case EncodingTypeJpCharCode.UTF16_LE_BOM_NO
+        Stream.Position = 0
+        Stream.Type = adTypeBinary
+        Stream.Position = 2
+        ByteData = Stream.Read
+        Stream.Close
+        Stream.Open
+        Call Stream.Write(ByteData)
+    Case EncodingTypeJpCharCode.UTF8_BOM_NO
+        Stream.Position = 0
+        Stream.Type = adTypeBinary
+        Stream.Position = 3
+        ByteData = Stream.Read
+        Stream.Close
+        Stream.Open
+        Call Stream.Write(ByteData)
+    End Select
+    Call Stream.SaveToFile(FilePath, adSaveCreateOverWrite)
+    Stream.Close
+End Sub
+
+Private Sub testString_SaveToFile()
+    Dim FolderPath As String
+    FolderPath = PathCombine( _
+        ThisWorkbook.Path, "Test", "ADOStream")
+    Call ForceCreateFolder(FolderPath)
+
+    Call String_SaveToFile( _
+        "Shift-JIS ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_Shift-JIS.txt"), _
+        EncodingTypeJpCharCode.Shift_JIS)
+
+    Call String_SaveToFile( _
+        "UTF-16LE-BOM ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-16LE-BOM.txt"), _
+        EncodingTypeJpCharCode.UTF16_LE_BOM)
+    Call String_SaveToFile( _
+        "UTF-16LE-BOM-NO ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-16LE-BOM-NO.txt"), _
+        EncodingTypeJpCharCode.UTF16_LE_BOM_NO)
+    
+    Call String_SaveToFile( _
+        "UTF-16BE-BOM ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-16BE-BOM.txt"), _
+        EncodingTypeJpCharCode.UTF16_BE_BOM)
+    Call String_SaveToFile( _
+        "UTF-16BE-BOM-NO ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-16BE-BOM-NO.txt"), _
+        EncodingTypeJpCharCode.UTF16_BE_BOM_NO)
+        
+    Call String_SaveToFile( _
+        "UTF-8-BOM ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-8-BOM.txt"), _
+        EncodingTypeJpCharCode.UTF8_BOM)
+    Call String_SaveToFile( _
+        "UTF-8-BOM-NO ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-8-BOM-NO.txt"), _
+        EncodingTypeJpCharCode.UTF8_BOM_NO)
+        
+    Call String_SaveToFile( _
+        "JIS ISO-2022-JP ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_JIS.txt"), _
+        EncodingTypeJpCharCode.JIS)
+        
+    Call String_SaveToFile( _
+        "EUC-JP ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_EUC-JP.txt"), _
+        EncodingTypeJpCharCode.EUC_JP)
+        
+    Call String_SaveToFile( _
+        "UTF-7 ＡＢＣ１２３", _
+        PathCombine(FolderPath, "test_UTF-7.txt"), _
+        EncodingTypeJpCharCode.UTF_7)
+        
 End Sub
 
 '----------------------------------------
@@ -5161,13 +5921,13 @@ End Function
 '----------------------------------------
 Public Function IsJpegExifFile(ByVal FilePath As String)
     Dim Result As Boolean: Result = False
-    
+
     If IsJpegImageFile(FilePath) Then
         If GetJpegExifDateTime(FilePath) <> 0 Then
             Result = True
         End If
     End If
-    
+
     IsJpegExifFile = Result
 End Function
 
@@ -5185,7 +5945,7 @@ On Error GoTo Err:
         Set WIA_ImageFile = CreateObject("Wia.ImageFile")
         Call WIA_ImageFile.LoadFile(FilePath)
 
-        
+
         '撮影日時
         Dim ExifDateTime As String
         ExifDateTime = WIA_ImageFile.Properties("36867")
@@ -5200,6 +5960,16 @@ End Function
 '----------------------------------------
 '◆シェル起動
 '----------------------------------------
+
+'----------------------------------------
+'・ コマンド実行
+'----------------------------------------
+'   ・  %ComSpec% /c は
+'       いろんなところで推奨されているけど
+'       Exeが長いネットワークパスにあるときは動かない場面があった
+'       なので、DOSコマンドではなく実行ファイルを指定して動かすのなら
+'       直接、Shell.Run(Command, のようにしたほうがいいかも
+'----------------------------------------
 Public Sub CommandExecute(Command As String)
     Dim Result As String: Result = ""
 
@@ -5213,6 +5983,9 @@ Private Sub testCommandExecute()
     Call CommandExecute("ping")
 End Sub
 
+'----------------------------------------
+'・ コマンド実行後の結果取得
+'----------------------------------------
 Public Function CommandExecuteReturn(Command As String, _
 Optional ByVal EncodeName As String = "Shift_JIS") As String
     Dim Result As String: Result = ""
@@ -5268,7 +6041,7 @@ End Function
 '----------------------------------------
 Public Sub SetClipboardText(ByVal ClipboardToText)
     Dim DataObject1 As New MSForms.DataObject
-    
+
     Call DataObject1.SetText(ClipboardToText)
     DataObject1.PutInClipboard
 End Sub
@@ -5290,21 +6063,34 @@ Public Sub Application_StatusBar_Progress(ByVal Message As String, _
 ByVal StartValue As Long, ByVal Value As Long, ByVal EndValue As Long, _
 Optional ReverseFlag As Boolean = False)
 
-    If ReverseFlag = False Then
-        Application.StatusBar = _
-            Message + ":" + _
-            CStr(Value - StartValue + 1) + "/" + _
-            CStr(EndValue - StartValue + 1) + ":" + _
-            CStr(Format((Value - StartValue + 1) / (EndValue - StartValue + 1) * 100, "0.00")) + "%"
-    Else
-        Application.StatusBar = _
-            Message + ":" + _
-            CStr(Value - StartValue + 1) + "/" + _
-            CStr(EndValue - StartValue + 1) + ":" + _
-            CStr(Format(100 - ((Value - StartValue + 1) / (EndValue - StartValue + 1) * 100), "0.00")) + "%"
-    End If
+    Application.StatusBar = ProgressText( _
+        Message + "|", "|", _
+        StartValue, Value, EndValue, _
+        ReverseFlag)
 
 End Sub
+
+Public Function ProgressText( _
+ByVal Message As String, ByVal Delimiter As String, _
+ByVal StartValue As Long, ByVal Value As Long, ByVal EndValue As Long, _
+Optional ReverseFlag As Boolean = False)
+    Dim Result As String
+    If ReverseFlag = False Then
+        Result = _
+            Message + _
+            CStr(Value - StartValue + 1) + "/" + _
+            CStr(EndValue - StartValue + 1) + Delimiter + _
+            CStr(Format((Value - StartValue + 1) / (EndValue - StartValue + 1) * 100, "0.00")) + "%"
+    Else
+        Result = _
+            Message + _
+            CStr(Value - StartValue + 1) + "/" + _
+            CStr(EndValue - StartValue + 1) + Delimiter + _
+            CStr(Format(100 - ((Value - StartValue + 1) / (EndValue - StartValue + 1) * 100), "0.00")) + "%"
+    End If
+    ProgressText = Result
+End Function
+
 
 '----------------------------------------
 '・列番号から列名を取得する
@@ -5363,15 +6149,15 @@ End Sub
 '----------------------------------------
 '   ・  日本語タイトル行などに対してタイトル文字列で行番号を返す
 '----------------------------------------
-Public Function ColumnNumberByTitle(ByRef Sheet As Worksheet, _
+Public Function Sheet_ColumnNumberByTitle(ByRef Sheet As Worksheet, _
 ByVal TitleRowIndex As Long, _
-ByVal ColumnTitle As String, _
+ByVal ColumnTitleWildCard As String, _
 Optional TitleMatchCount As Long = 1)
     Dim Result As Long: Result = 0
     Dim Counter As Long: Counter = 0
     Dim I As Long
-    For I = Col__A To DataLastCol(Sheet, TitleRowIndex)
-        If Sheet.Cells(TitleRowIndex, I).Value = ColumnTitle Then
+    For I = Col__A To Sheet_DataLastColumn(Sheet, TitleRowIndex)
+        If Sheet.Cells(TitleRowIndex, I).Value Like ColumnTitleWildCard Then
             Counter = Counter + 1
             If Counter = TitleMatchCount Then
             Result = I
@@ -5379,7 +6165,7 @@ Optional TitleMatchCount As Long = 1)
         End If
         End If
     Next
-    ColumnNumberByTitle = Result
+    Sheet_ColumnNumberByTitle = Result
 End Function
 
 
@@ -5388,15 +6174,15 @@ End Function
 '----------------------------------------
 '   ・  日本語タイトル行などに対してタイトル文字列で行番号を返す
 '----------------------------------------
-Public Function RowNumberByTitle(ByRef Sheet As Worksheet, _
+Public Function Sheet_RowNumberByTitle(ByRef Sheet As Worksheet, _
 ByVal TitleColIndex As Long, _
-ByVal RowTitle As String, _
+ByVal RowTitleWildCard As String, _
 Optional TitleMatchCount As Long = 1)
     Dim Result As Long: Result = 0
     Dim Counter As Long: Counter = 0
     Dim I As Long
-    For I = 1 To DataLastRow(Sheet, TitleColIndex)
-        If Sheet.Cells(I, TitleColIndex).Value = RowTitle Then
+    For I = 1 To Sheet_DataLastRow(Sheet, TitleColIndex)
+        If Sheet.Cells(I, TitleColIndex).Value Like RowTitleWildCard Then
             Counter = Counter + 1
             If Counter = TitleMatchCount Then
             Result = I
@@ -5404,7 +6190,7 @@ Optional TitleMatchCount As Long = 1)
         End If
         End If
     Next
-    RowNumberByTitle = Result
+    Sheet_RowNumberByTitle = Result
 End Function
 
 '----------------------------------------
@@ -5417,36 +6203,38 @@ End Function
 '----------------------------------------
 
 '・データ最終行
-Public Function DataLastRow(ByVal Sheet As Worksheet, _
+Public Function Sheet_DataLastRow(ByVal Sheet As Worksheet, _
 Optional ByVal ColumnNumber As Long = -1) As Long
 On Error Resume Next
-    DataLastRow = 1
+    Dim Result As Long: Result = 1
     Call Assert(-1 <= ColumnNumber, "Error:DataLastRow")
     If ColumnNumber = -1 Then
-        DataLastRow = Sheet.UsedRange.Find("*", _
+        Result = Sheet.UsedRange.Find("*", _
             , xlFormulas, , xlByRows, xlPrevious).Row
     Else
-        DataLastRow = Sheet.Cells(Sheet.Rows.Count, ColumnNumber).End(xlUp).Row
+        Result = Sheet.Cells(Sheet.Rows.Count, ColumnNumber).End(xlUp).Row
     End If
+    Sheet_DataLastRow = Result
 End Function
 
 '・データ最終列
-Public Function DataLastCol(ByVal Sheet As Worksheet, _
+Public Function Sheet_DataLastColumn(ByVal Sheet As Worksheet, _
 Optional ByVal RowNumber As Long = -1) As Long
 On Error Resume Next
-    DataLastCol = 1
+    Dim Result As Long: Result = 1
     Call Assert(-1 <= RowNumber, "Error:DataLastCol")
     If RowNumber = -1 Then
-        DataLastCol = Sheet.UsedRange.Find("*", _
+        Result = Sheet.UsedRange.Find("*", _
             , xlFormulas, , xlByColumns, xlPrevious).Column
     Else
-        DataLastCol = Sheet.Cells(RowNumber, Sheet.Columns.Count).End(xlToLeft).Column
+        Result = Sheet.Cells(RowNumber, Sheet.Columns.Count).End(xlToLeft).Column
     End If
+    Sheet_DataLastColumn = Result
 End Function
 
-Public Function DataLastCell(ByVal Sheet As Worksheet) As Range
-    Set DataLastCell = Sheet.Cells( _
-        DataLastRow(Sheet), DataLastCol(Sheet))
+Public Function Sheet_DataLastCellRange(ByVal Sheet As Worksheet) As Range
+    Set Sheet_DataLastCellRange = Sheet.Cells( _
+        Sheet_DataLastRow(Sheet), Sheet_DataLastColumn(Sheet))
 End Function
 
 '----------------------------------------
@@ -5455,7 +6243,7 @@ End Function
 '   ・  RangeClearTypeは
 '       Clear/ClearContents/ClearFormats
 '----------------------------------------
-Public Sub RangeClear(ByRef Range As Range, _
+Public Sub Range_Clear(ByRef Range As Range, _
 ByVal RangeClearType As RangeClearType, _
 Optional ByVal MergeCellOption As Boolean = False)
     Call Assert(OrValue(RangeClearType, _
@@ -5502,46 +6290,49 @@ Optional ByVal MergeCellOption As Boolean = False)
     End If
 End Sub
 
-Public Sub ClearRangeLastData(ByVal Sheet As Worksheet, _
+Public Sub Sheet_ClearRangeLastData( _
+ByVal Sheet As Worksheet, _
 ByVal RowIndex As Long, ByVal ColumnIndex As Long, _
 Optional ByVal RangeClearType As RangeClearType = rcClear, _
 Optional ByVal MergeCellOption As Boolean = False)
-    If (RowIndex <= DataLastRow(Sheet)) _
-    And (ColumnIndex <= DataLastCol(Sheet)) Then
-        Call RangeClear( _
+    If (RowIndex <= Sheet_DataLastRow(Sheet)) _
+    And (ColumnIndex <= Sheet_DataLastColumn(Sheet)) Then
+        Call Range_Clear( _
             Sheet.Range( _
                 Sheet.Cells(RowIndex, ColumnIndex), _
-                Sheet.Cells(DataLastRow(Sheet), DataLastCol(Sheet))), _
+                Sheet.Cells(Sheet_DataLastRow(Sheet), Sheet_DataLastColumn(Sheet))), _
             RangeClearType, MergeCellOption)
     End If
 End Sub
 
 '・列のクリア、最終行まで
-Public Sub ClearColumnLastRow(ByVal Sheet As Worksheet, _
+Public Sub Sheet_ClearColumnLastRow( _
+ByVal Sheet As Worksheet, _
 ByVal RowIndex As Long, ByVal ColumnIndex As Long, _
 Optional ByVal RangeClearType As RangeClearType = rcClear, _
 Optional ByVal MergeCellOption As Boolean = False)
-    Dim LastRow As Long: LastRow = DataLastRow(Sheet, ColumnIndex)
+    Dim LastRow As Long: LastRow = Sheet_DataLastRow(Sheet, ColumnIndex)
     If (RowIndex <= LastRow) Then
-        Call RangeClear( _
+        Call Range_Clear( _
             Sheet.Range( _
                 Sheet.Cells(RowIndex, ColumnIndex), _
-                Sheet.Cells(DataLastRow(Sheet, ColumnIndex), ColumnIndex)), _
+                Sheet.Cells(Sheet_DataLastRow(Sheet, ColumnIndex), ColumnIndex)), _
             RangeClearType, MergeCellOption)
     End If
 End Sub
 
 '・行のクリア、最終列まで
-Public Sub ClearRowLastColumn(ByVal Sheet As Worksheet, _
+Public Sub Sheet_ClearRowLastColumn( _
+ByVal Sheet As Worksheet, _
 ByVal RowIndex As Long, ByVal ColumnIndex As Long, _
 Optional ByVal RangeClearType As RangeClearType = rcClear, _
 Optional ByVal MergeCellOption As Boolean = False)
-    Dim LastCol As Long: LastCol = DataLastCol(Sheet, RowIndex)
+    Dim LastCol As Long: LastCol = Sheet_DataLastColumn(Sheet, RowIndex)
     If (ColumnIndex <= LastCol) Then
-        Call RangeClear( _
+        Call Range_Clear( _
             Sheet.Range( _
                 Sheet.Cells(RowIndex, ColumnIndex), _
-                Sheet.Cells(RowIndex, DataLastCol(Sheet, RowIndex))), _
+                Sheet.Cells(RowIndex, Sheet_DataLastColumn(Sheet, RowIndex))), _
             RangeClearType, MergeCellOption)
     End If
 End Sub
@@ -5553,7 +6344,8 @@ End Sub
 '----------------------------------------
 '・数式を削除する関数
 '----------------------------------------
-Public Sub RangeDeleteFormula(ByRef Sheet As Worksheet, ByRef Range As Range)
+Public Sub Sheet_RangeDeleteFormula( _
+ByRef Sheet As Worksheet, ByRef Range As Range)
 
     '数式に影響が出ないように指定範囲の後方から値を指定している
     '=SUBTOTAL(9, …
@@ -5586,14 +6378,14 @@ End Sub
 '       ファイルが破損しているのかもしれないが解消できなかったので
 '       この関数を作成
 '----------------------------------------
-Public Sub RangeCopyNumberFormat( _
+Public Sub Range_CopyNumberFormat( _
 ByRef RangeSource As Range, _
 ByRef RangeDest As Range)
     Dim FormatText As String
     Dim CellRangeSource As Range
     For Each CellRangeSource In RangeSource
         FormatText = CellRangeSource.NumberFormatLocal
-        
+
         RangeDest.Parent.Cells( _
             RangeDest.Row + (CellRangeSource.Row - RangeSource.Row), _
             RangeDest.Column + (CellRangeSource.Column - RangeSource.Column) _
@@ -5605,35 +6397,41 @@ End Sub
 '----------------------------------------
 '・値など全てのコピー
 '----------------------------------------
-Public Sub RangeCopyAll( _
+Public Sub Range_CopyAll( _
 ByRef RangeSource As Range, _
 ByRef RangeDest As Range)
     RangeSource.Copy
     Call RangeDest.PasteSpecial(Paste:=xlPasteAll)
-    Call RangeCopyNumberFormat(RangeSource, RangeDest)
+    Call Range_CopyNumberFormat(RangeSource, RangeDest)
 End Sub
 
 '----------------------------------------
 '・書式のコピー
 '----------------------------------------
-Public Sub RangeCopyFormat( _
+Public Sub Range_CopyFormat( _
 ByRef RangeSource As Range, _
 ByRef RangeDest As Range)
     RangeSource.Copy
     Call RangeDest.PasteSpecial(Paste:=xlPasteFormats)
-    Call RangeCopyNumberFormat(RangeSource, RangeDest)
+    Call Range_CopyNumberFormat(RangeSource, RangeDest)
 End Sub
 
 '----------------------------------------
 '・値のコピー
 '----------------------------------------
-Public Sub RangeCopyValue( _
+Public Sub Range_CopyValue( _
 ByRef RangeSource As Range, _
 ByRef RangeDest As Range)
     RangeSource.Copy
     Call RangeDest.PasteSpecial(Paste:=xlPasteAllUsingSourceTheme)
-    Call RangeCopyNumberFormat(RangeSource, RangeDest)
+    Call Range_CopyNumberFormat(RangeSource, RangeDest)
 End Sub
+
+
+'----------------------------------------
+'◇セル
+'----------------------------------------
+
 
 
 
@@ -5644,16 +6442,16 @@ End Sub
 '----------------------------------------
 '・範囲の上の1行
 '----------------------------------------
-Public Function RangeUpRow(ByRef SourceRange As Range) As Range
-    Set RangeUpRow = _
+Public Function Range_UpRow(ByRef SourceRange As Range) As Range
+    Set Range_UpRow = _
         SourceRange.Resize(1, SourceRange.Columns.Count).Offset(-1, 0)
 End Function
 
 '----------------------------------------
 '・範囲の下の1行
 '----------------------------------------
-Public Function RangeDownRow(ByRef SourceRange As Range) As Range
-    Set RangeDownRow = _
+Public Function Range_DownRow(ByRef SourceRange As Range) As Range
+    Set Range_DownRow = _
         SourceRange.Resize(1, SourceRange.Columns.Count).Offset( _
             SourceRange.Rows.Count, 0)
 End Function
@@ -5665,69 +6463,69 @@ End Function
 '----------------------------------------
 '・範囲を上に1、移動する
 '----------------------------------------
-Public Sub RangeMoveUpRowOne(ByRef SourceRange As Range)
+Public Sub Range_MoveUpRowOne(ByRef SourceRange As Range)
     '複数の選択範囲には非対応
     Call Assert(SourceRange.Areas.Count = 1, _
         "Error:RangeMoveUpRowOne:Areas.Count != 1")
-        
+
     Dim EnableEventsBuffer As Boolean
     EnableEventsBuffer = _
         Application.EnableEvents
     Application.EnableEvents = False
-        
+
     Dim SelectionFlag As Boolean
     If Selection.Address = SourceRange.Address Then
         SelectionFlag = True
     Else
         SelectionFlag = False
     End If
-    
+
     '選択範囲の下1セルをあける
-    Call RangeDownRow(SourceRange).Insert(xlDown)
-    
+    Call Range_DownRow(SourceRange).Insert(xlDown)
+
     '上のセルを下のセルにコピーする
-    Call RangeUpRow(SourceRange).Copy( _
-        Destination:=RangeDownRow(SourceRange))
-    
+    Call Range_UpRow(SourceRange).Copy( _
+        Destination:=Range_DownRow(SourceRange))
+
     '上のセルを1つ削除
-    Call RangeUpRow(SourceRange).Delete(xlUp)
-    
+    Call Range_UpRow(SourceRange).Delete(xlUp)
+
     '選択位置を1つ上にする
     If SelectionFlag Then
         SourceRange.Select
     End If
-    
+
     Application.EnableEvents = EnableEventsBuffer
-    
+
 End Sub
 
-Public Sub RangeMoveDownRowOne(ByRef SourceRange As Range)
+Public Sub Range_MoveDownRowOne(ByRef SourceRange As Range)
     '複数の選択範囲には非対応
     Call Assert(SourceRange.Areas.Count = 1, _
         "Error:RangeMoveUpRowOne:Areas.Count != 1")
-        
+
     Dim EnableEventsBuffer As Boolean
     EnableEventsBuffer = _
         Application.EnableEvents
     Application.EnableEvents = False
-        
+
     Dim SelectionFlag As Boolean
     If Selection.Address = SourceRange.Address Then
         SelectionFlag = True
     Else
         SelectionFlag = False
     End If
-        
+
     '選択範囲の上1セルをあける
     Call SourceRange.Resize(1, Selection.Columns.Count).Insert(xlDown)
-    
+
     '下のセルを上のセルにコピーする
-    Call RangeDownRow(SourceRange).Copy( _
-        Destination:=RangeUpRow(SourceRange))
-    
+    Call Range_DownRow(SourceRange).Copy( _
+        Destination:=Range_UpRow(SourceRange))
+
     '下のセルを1つ削除
-    Call RangeDownRow(SourceRange).Delete(xlUp)
-    
+    Call Range_DownRow(SourceRange).Delete(xlUp)
+
     '選択位置を1つ上にする
     If SelectionFlag Then
         SourceRange.Select
@@ -5742,57 +6540,272 @@ End Sub
 '◆Excel オブジェクト
 '----------------------------------------
 
+
 '----------------------------------------
-'◇ワークブック
+'◇ Applicationによるワークブック操作
 '----------------------------------------
+
+
 '----------------------------------------
 '・ワークブックの存在確認
 '----------------------------------------
-Public Function GetWorkbook( _
-ByVal WorkbookNameWildCard As String, _
-Optional ByVal WorkbookFolderPath As String = "", _
-Optional ByVal App As Application = Nothing) As Workbook
-
-    If App Is Nothing Then Set App = Application
+Public Function App_GetOpenedBook( _
+ByVal App As Application, _
+ByVal BookNameWildCard As String, _
+Optional ByVal BookFolderPath As String = "") As Workbook
 
     Dim Result As Workbook: Set Result = Nothing
     Dim Book As Workbook
-    If WorkbookFolderPath = "" Then
+    If BookFolderPath = "" Then
         For Each Book In App.Workbooks
-            If Book.Name Like WorkbookNameWildCard Then
+            If Book.Name Like BookNameWildCard Then
                 Set Result = Book
                 Exit For
             End If
         Next
     Else
         For Each Book In App.Workbooks
-            If (Book.Name Like WorkbookNameWildCard) _
-            And (Book.Path = WorkbookFolderPath) Then
+            If (Book.Name Like BookNameWildCard) _
+            And (Book.Path = BookFolderPath) Then
                 Set Result = Book
                 Exit For
             End If
         Next
     End If
-    Set GetWorkbook = Result
+    Set App_GetOpenedBook = Result
 End Function
 
-Public Function WorkbookExists( _
-ByVal WorkbookNameWildCard As String, _
-Optional ByVal WorkbookFolderPath As String = "", _
-Optional ByVal App As Application = Nothing) As Boolean
+Public Function App_OpenedBookExists( _
+ByVal App As Application, _
+ByVal BookNameWildCard As String, _
+Optional ByVal BookFolderPath As String = "") As Boolean
 
     Dim Result As Boolean: Result = False
-    If (GetWorkbook(WorkbookNameWildCard) Is Nothing) = False Then
+    If IsNotNothing( _
+        App_GetOpenedBook(App, BookNameWildCard, BookFolderPath)) Then
         Result = True
     End If
 
-    WorkbookExists = Result
+    App_OpenedBookExists = Result
 End Function
 
-Public Sub testWorkbookExists()
-    Call Check(True, WorkbookExists("st_vba.xlsm"))
-    Call Check(True, WorkbookExists("st_vba*"))
-    Call Check(False, WorkbookExists("st_vba.xls"))
+Public Sub testBook_Exists()
+    Call Check(True, App_OpenedBookExists(Application, "st_vba.xlsm"))
+    Call Check(True, App_OpenedBookExists(Application, "st_vba*"))
+    Call Check(False, App_OpenedBookExists(Application, "st_vba.xls"))
+End Sub
+
+'----------------------------------------
+'・ワークブックが開いていれば取得
+'  開いていなければ開く
+'----------------------------------------
+
+Public Function App_GetOpenedBookOrOpenBook( _
+ByVal App As Application, _
+ByVal FilePath As String, _
+Optional ByVal CheckFullPath As Boolean = False, _
+Optional ByVal OpenReadOnlyFlag As Boolean = False, _
+Optional ByRef ResultOpen As Boolean) As Workbook
+    Dim Result As Workbook
+    
+    If CheckFullPath Then
+        Set Result = App_GetOpenedBook(App, _
+            fso.GetFileName(FilePath), _
+            fso.GetParentFolderName(FilePath))
+    Else
+        Set Result = App_GetOpenedBook(App, _
+            fso.GetFileName(FilePath))
+    End If
+    
+    If (IsNothing(Result)) Then
+        Set Result = App.Workbooks.Open(FilePath, , OpenReadOnlyFlag)
+        ResultOpen = True
+    Else
+        ResultOpen = False
+    End If
+    
+    Set App_GetOpenedBookOrOpenBook = Result
+End Function
+
+
+'----------------------------------------
+'◇ ワークブック
+'----------------------------------------
+
+'----------------------------------------
+'・ワークブックのフルパス取得
+'----------------------------------------
+Public Function Book_FullPath( _
+ByVal Book As Workbook) As String
+    Book_FullPath = _
+        PathCombine( _
+            Book.Path, _
+            Book.Name)
+End Function
+
+'----------------------------------------
+'・ワークブックを確認ダイアログなど無しで保存する
+'----------------------------------------
+'   ・  旧形式(XLS)の拡張子に自動対応
+'----------------------------------------
+Public Sub Book_SaveAs( _
+ByVal Book As Workbook, _
+ByVal FilePath As String)
+
+    If Val(Application.Version) < 12 Then
+        '以前のバージョンならそのまま保存
+        Call Book.SaveAs(FilePath)
+    Else
+        '現在のバージョンの場合、拡張子XLS なら古い形式で保存
+        If LCase(GetExtensionIncludePeriod(FilePath)) = ".xls" Then
+        
+            '旧バージョンの確認ダイアログのようなものを出させない
+            
+            Dim Application_DisplayAlerts_Flag As Boolean
+            Application_DisplayAlerts_Flag = Application.DisplayAlerts
+            Application.DisplayAlerts = False
+            Call Book.SaveAs(FilePath, XlFileFormat.xlExcel8)
+            Application.DisplayAlerts = Application_DisplayAlerts_Flag
+        Else
+            Call Book.SaveAs(FilePath)
+        End If
+    End If
+
+End Sub
+
+'----------------------------------------
+'・ワークブックを確認ダイアログなど無しで閉じる
+'----------------------------------------
+Public Sub Book_CloseSilence(ByVal Book As Workbook)
+    Call Book.Close(SaveChanges:=False)
+End Sub
+
+'----------------------------------------
+'・ワークブックBeforCloseイベント時に保存するかしないかを記述する
+'----------------------------------------
+Public Sub Book_BeforeClose_NoSave( _
+ByVal Book As Workbook)
+    '終了時に保存しないためにSavedフラグをTrueにする
+    Book.Saved = True
+End Sub
+
+Public Sub Book_BeforeClose_Save( _
+ByVal Book As Workbook)
+    Call Book.Save
+End Sub
+
+'----------------------------------------
+'・ワークシートの存在確認
+'----------------------------------------
+
+Public Function Book_GetSheet( _
+ByVal Book As Workbook, _
+ByVal SheetNameWildCard As String) As Worksheet
+
+    Dim Result As Worksheet: Set Result = Nothing
+    Dim I As Long
+    For I = 1 To Book.Sheets.Count
+        If Book.Sheets(I).Name Like SheetNameWildCard Then
+            Set Result = Book.Sheets(I)
+            Exit For
+        End If
+    Next
+
+    Set Book_GetSheet = Result
+End Function
+
+Public Function Book_SheetExists( _
+ByVal Book As Workbook, _
+ByVal SheetNameWildCard As String) As Boolean
+
+    Dim Result As Boolean: Result = False
+    If (Book_GetSheet(Book, SheetNameWildCard) Is Nothing) = False Then
+        Result = True
+    End If
+
+    Book_SheetExists = Result
+End Function
+
+Public Sub testBook_SheetExists()
+    Call Check(True, Book_SheetExists(ThisWorkbook, "Sheet1"))
+    Call Check(True, Book_SheetExists(ThisWorkbook, "Sheet*"))
+    Call Check(False, Book_SheetExists(ThisWorkbook, "Sheet"))
+End Sub
+
+'----------------------------------------
+'・ワークシートの削除
+'----------------------------------------
+Public Sub Book_DefaultSheetsDelete( _
+ByVal Book As Workbook)
+    Call Book_SheetsDelete(Book, "Sheet*", , False)
+End Sub
+
+'----------------------------------------
+'・ワークシート(複数)の削除
+'----------------------------------------
+'   ・  次のようにして使うと便利
+'           Call DeleteSheets("*(?)")
+'       Sheet1(2) という名前のシートだけ削除される
+'----------------------------------------
+Public Sub Book_SheetsDelete( _
+ByVal Book As Workbook, _
+ByVal SheetNameWildCard As String, _
+Optional MatchUnDelete As Boolean = False, _
+Optional MsgBoxFlag As Boolean = True)
+
+    Dim MessageText As String
+    MessageText = ""
+
+    Dim Sheet As Worksheet
+    Dim I As Long
+    For I = Book.Sheets.Count To 1 Step -1
+        If MatchUnDelete = False Then
+            If (Book.Sheets(I).Name Like SheetNameWildCard) Then
+                MessageText = MessageText + _
+                    Book.Sheets(I).Name + vbCrLf
+            End If
+        Else
+            If Not (Book.Sheets(I).Name Like SheetNameWildCard) Then
+                MessageText = MessageText + _
+                    Book.Sheets(I).Name + vbCrLf
+            End If
+        End If
+    Next
+    
+    If MessageText = "" Then
+        If MsgBoxFlag Then
+            Call MsgBox("削除対象シートはありません。")
+        End If
+        Exit Sub
+    End If
+    
+    If MsgBoxFlag Then
+        If MsgBox(StringCombine(vbCrLf, _
+            "次のシートを削除しますか？", MessageText), _
+            vbYesNo, "シート削除") _
+            <> VbMsgBoxResult.vbYes Then
+            Exit Sub
+        End If
+    End If
+    
+    Dim Application_DisplayAlerts_Flag As Boolean
+    Application_DisplayAlerts_Flag = Application.DisplayAlerts
+    Application.DisplayAlerts = False
+    
+    For I = Book.Sheets.Count To 1 Step -1
+        If MatchUnDelete = False Then
+            If (Book.Sheets(I).Name Like SheetNameWildCard) Then
+                Book.Sheets(I).Delete
+            End If
+        Else
+            If Not (Book.Sheets(I).Name Like SheetNameWildCard) Then
+                Book.Sheets(I).Delete
+            End If
+        End If
+    Next
+        
+    Application.DisplayAlerts = Application_DisplayAlerts_Flag
+    
 End Sub
 
 '----------------------------------------
@@ -5800,81 +6813,22 @@ End Sub
 '----------------------------------------
 
 '----------------------------------------
-'・ワークシートの存在確認
+'・ワークシートを確認ダイアログ無しで削除する
 '----------------------------------------
-
-Public Function GetWorksheet(ByVal SheetNameWildCard As String, _
-Optional ByVal Book As Workbook = Nothing) As Worksheet
-
-    If Book Is Nothing Then
-        Set Book = ThisWorkbook
-    End If
-
-    Dim Result As Worksheet: Set Result = Nothing
-    Dim I As Long
-    For I = 1 To Book.Sheets.Count
-        If Book.Sheets(I).Name Like SheetNameWildCard Then
-            Set Result = Book.Sheets(I)
-        End If
-    Next
-    
-    Set GetWorksheet = Result
-End Function
-
-Public Function WorksheetExists(ByVal SheetNameWildCard As String, _
-Optional ByVal Book As Workbook = Nothing) As Boolean
-
-    Dim Result As Boolean: Result = False
-    If (GetWorksheet(SheetNameWildCard) Is Nothing) = False Then
-        Result = True
-    End If
-        
-    WorksheetExists = Result
-End Function
-
-Public Sub testWorksheetExists()
-    Call Check(True, WorksheetExists("Sheet1"))
-    Call Check(True, WorksheetExists("Sheet*"))
-    Call Check(False, WorksheetExists("Sheet"))
+Public Sub Sheet_DeleteSilence(ByVal Sheet As Worksheet)
+    Dim Application_DisplayAlerts_Flag As Boolean
+    Application_DisplayAlerts_Flag = Application.DisplayAlerts
+    Application.DisplayAlerts = False
+    Call Sheet.Delete
+    Application.DisplayAlerts = Application_DisplayAlerts_Flag
 End Sub
 
-'----------------------------------------
-'・ワークシートの削除
-'----------------------------------------
-
-Public Sub DeleteSheet(ByVal SheetNameWildCard As String, _
-Optional MatchUnDelete As Boolean = False, _
-Optional ByVal Book As Workbook = Nothing)
-
-    If Book Is Nothing Then
-        Set Book = ThisWorkbook
-    End If
-
-    Dim Sheet As Worksheet
-    Dim I As Long
-    For I = Book.Sheets.Count To 1 Step -1
-        If MatchUnDelete Then
-            If Not (Book.Sheets(I).Name Like SheetNameWildCard) Then
-                Book.Sheets(I).Delete
-            End If
-        Else
-            If (Book.Sheets(I).Name Like SheetNameWildCard) Then
-            Book.Sheets(I).Delete
-        End If
-        End If
-    Next
-    
-End Sub
-
-Public Sub DeleteDefaultSheet()
-    Call DeleteSheet("Sheet*")
-End Sub
 
 '----------------------------------------
 '・ワークシートへのテキスト配置
 '----------------------------------------
 
-Public Sub SetTextSheet(ByVal Sheet As Worksheet, _
+Public Sub Sheet_SetText(ByVal Sheet As Worksheet, _
 ByVal RowIndex As Long, ByVal ColumnIndex As Long, _
 ByVal DocumentText As String)
 
@@ -5898,6 +6852,16 @@ ByVal DocumentText As String)
         End If
         LineIndex = LineIndex + 1
     Next
+End Sub
+
+'----------------------------------------
+'・値の増加
+'----------------------------------------
+Public Sub Sheet_CellValueIncrement( _
+ByVal Sheet As Worksheet, _
+ByVal Row As Long, ByVal Col As Long, _
+ByVal Increment As Long)
+    Sheet.Cells(Row, Col).Value = Sheet.Cells(Row, Col).Value + Increment
 End Sub
 
 '----------------------------------------
@@ -6002,19 +6966,19 @@ Public Function GetShapeFromImageFile(ByVal Sheet As Worksheet, _
     Optional HorizontalAlign As AlineHorizontal = AlineHorizontal.alCenter, _
     Optional VerticalAlign As AlineVertical = AlineVertical.alCenter) _
     As Shape
-    
+
     If fso.FileExists(ImageFilePath) = False Then
         Set GetShapeFromImageFile = Nothing
         Exit Function
     End If
-    
+
     'マージンをとるために値を設定
     Dim Rect As Rect
     Rect.Left = SheetRange.Left + Margin
     Rect.Top = SheetRange.Top + Margin
     Call SetRectWidth(Rect, SheetRange.Width - (Margin * 2))
     Call SetRectHeight(Rect, SheetRange.Height - (Margin * 2))
-    
+
     Dim Shape As Shape
     Set Shape = Sheet.Shapes.AddPicture( _
         Filename:=ImageFilePath, LinkToFile:=False, _
@@ -6023,20 +6987,20 @@ Public Function GetShapeFromImageFile(ByVal Sheet As Worksheet, _
         Top:=Rect.Top, _
         Width:=0, _
         Height:=0)
-    
+
     '元画像サイズに戻す
     Call Shape.ScaleHeight(1#, True)
     Call Shape.ScaleWidth(1#, True)
-    
+
     '縦横比を保持したまま、高さを調整する
     Shape.LockAspectRatio = True
     Shape.Height = GetRectHeight(Rect)
-    
+
     '画像横サイズが範囲内に収まっているかどうか確認
     If Shape.Width > GetRectWidth(Rect) Then
         '横サイズがはみ出ているなら横を合わせる
         Shape.Width = GetRectWidth(Rect)
-        
+
         '左右位置はぴったりなので上下位置調整をする
         Select Case VerticalAlign
         Case AlineVertical.alCenter
@@ -6053,7 +7017,7 @@ Public Function GetShapeFromImageFile(ByVal Sheet As Worksheet, _
             Shape.Left = Shape.Left + (GetRectWidth(Rect) - Shape.Width)
         End Select
     End If
-    
+
     Set GetShapeFromImageFile = Shape
 End Function
 
@@ -6070,7 +7034,7 @@ On Error Resume Next
     Point.Y = Shape.Top
     RectSize.Width = Shape.Width
     RectSize.Height = Shape.Height
-    
+
     Shape.Cut
     If Err.Number <> 0 Then
         Err.Clear
@@ -6080,10 +7044,10 @@ On Error Resume Next
             Shape.Cut
         End If
     End If
-    
+
     Sheet.Select
     Sheet.Activate
-    
+
 '    Sheet.PasteSpecial Format:="図 (拡張メタファイル)", Link:=False, DisplayAsIcon:=False
 
     Sheet.PasteSpecial Format:="図 (JPEG)", Link:=False, DisplayAsIcon:=False
@@ -6095,7 +7059,7 @@ On Error Resume Next
             Sheet.PasteSpecial Format:="図 (JPEG)", Link:=False, DisplayAsIcon:=False
         End If
     End If
-    
+
     Selection.ShapeRange.Width = RectSize.Width
     Selection.ShapeRange.Height = RectSize.Height
     Selection.Left = Point.X
@@ -6120,20 +7084,261 @@ ByVal Top As Long, ByVal Left As Long) As Range
         If Top < Sheet.Rows(Row + 1).Top Then Exit Do
         Row = Row + 1
     Loop While True
-    
+
     Dim Col As Long
     Col = 0
     Do
         If Left < Sheet.Columns(Col + 1).Left Then Exit Do
         Col = Col + 1
     Loop While True
-    
+
     Set TopLeftCell = Sheet.Cells(Row, Col)
 End Function
 
 Public Sub testTopLeftCell()
     Call Check(Sheets(1).Cells(1, 1), TopLeftCell(Sheets(1), 0, 0))
 End Sub
+
+
+'----------------------------------------
+'◇ ファイル選択ダイアログ
+'----------------------------------------
+
+'----------------------------------------
+'・ ファイル選択ダイアログ
+'----------------------------------------
+'   ・  ダイアログのタイトルには「参照」と表示される
+'   ・  Application.FileDialog(msoFileDialogFilePicker)
+'       をラッピング
+'   ・  Filtersは
+'           "Excelブック|*.xls; *.xlsx; *.xlsm"
+'           "Textファイル|*.txt"
+'       という形式にする。
+'       [*.txt;]という形式にはしないこと。エラーになる。
+'   ・  戻り値は改行区切りのフルパス
+'       キャンセルが押された場合には空文字が返る
+'----------------------------------------
+Public Function FileDialog_FilePicker(ByVal FilePath As String, _
+ByVal OptionInitialView As MsoFileDialogView, _
+ByVal OptionAllowMultiSelect As Boolean, _
+ParamArray Filters())
+
+    Dim Result As String: Result = ""
+
+    Dim Dialog As FileDialog
+    Set Dialog = Application.FileDialog(msoFileDialogFilePicker)
+    
+    Call Dialog.Filters.Clear
+    Dim I As Long
+    For I = LBound(Filters) To UBound(Filters)
+        Call Dialog.Filters.Add( _
+            FirstStrFirstDelim(Filters(I), "|"), _
+            LastStrFirstDelim(Filters(I), "|"), I + 1)
+            
+'        Call Dialog.Filters.Add("Excelブック", "*.xls; *.xlsx; *.xlsm", 1)
+'        Call Dialog.Filters.Add("Textファイル", "*.txt", 1)
+    Next
+        
+    Dialog.InitialFileName = FilePath
+    Dialog.InitialView = OptionInitialView
+    Dialog.AllowMultiSelect = OptionAllowMultiSelect
+    If Dialog.Show = True Then
+
+        For I = 1 To Dialog.SelectedItems.Count
+            Result = StringCombine(vbCrLf, Result, Dialog.SelectedItems(I))
+        Next
+
+    End If
+    
+    FileDialog_FilePicker = Result
+End Function
+
+Public Sub testFileDialog_FilePicker()
+    Dim Result As String
+    Result = FileDialog_FilePicker(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails, True)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_FilePicker(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails, False, _
+        "Excelブック|*.xls; *.xlsx; *.xlsm", _
+        "Textファイル|*.txt")
+    Call MsgBox(Result)
+    
+    Result = FileDialog_FilePicker("", _
+        msoFileDialogViewDetails, True)
+    Call MsgBox(Result)
+End Sub
+
+
+'----------------------------------------
+'・ ファイルオープンダイアログ
+'----------------------------------------
+'   ・  ダイアログのタイトルには「ファイルを開く」と表示される
+'   ・  Application.FileDialog(msoFileDialogOpen)
+'       をラッピング
+'   ・  Filtersは
+'           "Excelブック|*.xls; *.xlsx; *.xlsm"
+'           "Textファイル|*.txt"
+'       という形式にする。
+'       [*.txt;]という形式にはしないこと。エラーになる。
+'   ・  戻り値は改行区切りのフルパス
+'       キャンセルが押された場合には空文字が返る
+'----------------------------------------
+Public Function FileDialog_Open(ByVal FilePath As String, _
+ByVal OptionInitialView As MsoFileDialogView, _
+ByVal OptionAllowMultiSelect As Boolean, _
+ParamArray Filters())
+
+    Dim Result As String: Result = ""
+
+    Dim Dialog As FileDialog
+    Set Dialog = Application.FileDialog(msoFileDialogOpen)
+    
+    Call Dialog.Filters.Clear
+    Dim I As Long
+    For I = LBound(Filters) To UBound(Filters)
+        Call Dialog.Filters.Add( _
+            FirstStrFirstDelim(Filters(I), "|"), _
+            LastStrFirstDelim(Filters(I), "|"), I + 1)
+            
+'        Call Dialog.Filters.Add("Excelブック", "*.xls; *.xlsx; *.xlsm", 1)
+'        Call Dialog.Filters.Add("Textファイル", "*.txt", 1)
+    Next
+        
+    Dialog.InitialFileName = FilePath
+    Dialog.InitialView = OptionInitialView
+    Dialog.AllowMultiSelect = OptionAllowMultiSelect
+    If Dialog.Show = True Then
+
+        For I = 1 To Dialog.SelectedItems.Count
+            Result = StringCombine(vbCrLf, Result, Dialog.SelectedItems(I))
+        Next
+
+    End If
+    
+    FileDialog_Open = Result
+End Function
+
+Public Sub testFileDialog_Open()
+    Dim Result As String
+    Result = FileDialog_Open(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails, True)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_Open(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails, False, _
+        "Excelブック|*.xls; *.xlsx; *.xlsm", _
+        "Textファイル|*.txt")
+    Call MsgBox(Result)
+    
+    Result = FileDialog_Open("", _
+        msoFileDialogViewDetails, True)
+    Call MsgBox(Result)
+End Sub
+
+'----------------------------------------
+'・ 名前を付けて保存ダイアログ
+'----------------------------------------
+'   ・  ダイアログのタイトルには「名前を付けて保存」と表示される
+'   ・  Application.FileDialog(msoFileDialogSaveAs)
+'       をラッピング
+'   ・  Filterは指定できない。Excel標準の保存形式で固定。
+'   ・  複数選択もできない。(しても単独選択のみ)
+'   ・  戻り値はフルパス
+'       キャンセルが押された場合には空文字が返る
+'----------------------------------------
+Public Function FileDialog_SaveAs(ByVal FilePath As String, _
+ByVal OptionInitialView As MsoFileDialogView)
+
+    Dim Result As String: Result = ""
+
+    Dim Dialog As FileDialog
+    Set Dialog = Application.FileDialog(msoFileDialogSaveAs)
+    
+    Dialog.InitialFileName = FilePath
+    Dialog.InitialView = OptionInitialView
+    If Dialog.Show = True Then
+        Dim I As Long
+        For I = 1 To Dialog.SelectedItems.Count
+            Result = StringCombine(vbCrLf, Result, Dialog.SelectedItems(I))
+        Next
+
+    End If
+    
+    FileDialog_SaveAs = Result
+End Function
+
+Public Sub testFileDialog_SaveAs()
+    Dim Result As String
+    Result = FileDialog_SaveAs(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_SaveAs(Book_FullPath(ThisWorkbook), _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_SaveAs("", _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+End Sub
+
+
+'----------------------------------------
+'・ フォルダ選択ダイアログ
+'----------------------------------------
+'   ・  ダイアログのタイトルには「参照」と表示される
+'   ・  Application.FileDialog(msoFileDialogFolderPicker)
+'       をラッピング
+'   ・  Filterは指定できない。
+'   ・  複数選択もできない。(しても単独選択のみ)
+'   ・  戻り値はフルパス
+'       キャンセルが押された場合には空文字が返る
+'   ・  InitialFileName はフォルダ選択としてはいまいちな動作。
+'       指定したフォルダが開くが
+'       そのままOKを押しても、
+'       そのフォルダ内に同名フォルダが無いとなる
+'       回避不可能な不具合と思える
+'----------------------------------------
+Public Function FileDialog_FolderPicker(ByVal FolderPath As String, _
+ByVal OptionInitialView As MsoFileDialogView)
+
+    Dim Result As String: Result = ""
+
+    Dim Dialog As FileDialog
+    Set Dialog = Application.FileDialog(msoFileDialogFolderPicker)
+    
+    Dim I As Long
+        
+    Dialog.InitialFileName = FolderPath
+    Dialog.InitialView = OptionInitialView
+    If Dialog.Show = True Then
+
+        For I = 1 To Dialog.SelectedItems.Count
+            Result = StringCombine(vbCrLf, Result, Dialog.SelectedItems(I))
+        Next
+
+    End If
+    
+    FileDialog_FolderPicker = Result
+End Function
+
+Public Sub testFileDialog_FolderPicker()
+    Dim Result As String
+    Result = FileDialog_FolderPicker(ThisWorkbook.Path, _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_FolderPicker(ThisWorkbook.Path, _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+    
+    Result = FileDialog_FolderPicker("", _
+        msoFileDialogViewDetails)
+    Call MsgBox(Result)
+End Sub
+
 
 
 '----------------------------------------
@@ -7133,95 +8338,74 @@ Public Function UrlEncode(ByVal Word As String) As String
     UrlEncode = Element.InnerText
 End Function
 
-'----------------------------------------
-'◆VBE操作
-'----------------------------------------
-
 
 '----------------------------------------
-'◆参照設定追加
+'◆IPアドレス
 '----------------------------------------
 
 '----------------------------------------
-'・Microsoft Scripting Runtime
+'・文字列がIPアドレスなのかどうかを判定する関数
 '----------------------------------------
-'   ・  FSO:FileSystemObjectを使用するのに必要
-'----------------------------------------
-Sub ReferenceAdd_ScriptingRuntime(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Windows\system32\scrrun.dll")
-End Sub
-
-Sub Run_ReferenceAdd_ScriptingRuntime()
-    Call ReferenceAdd_ScriptingRuntime(ThisWorkbook)
-End Sub
-
-'----------------------------------------
-'・Windows Script Host Object Model
-'----------------------------------------
-'   ・  WshShellを使用するのに必要
-'----------------------------------------
-Sub ReferenceAdd_WshObjectModel(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Windows\system32\wshom.ocx")
-End Sub
-
-Sub Run_ReferenceAdd_WshObjectModel()
-    Call ReferenceAdd_WshObjectModel(ThisWorkbook)
-End Sub
-
-'----------------------------------------
-'・Microsoft Windows Common Controls 6.0 (SP6)
-'----------------------------------------
-Sub ReferenceAdd_CommonControls(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Windows\System32\MSCOMCTL.OCX")
-End Sub
-
-Sub Run_ReferenceAdd_CommonControls()
-    Call ReferenceAdd_CommonControls(ThisWorkbook)
-End Sub
+Public Function IsIPAddress( _
+ByVal Value As String) As Boolean
+    Dim Result As Boolean
+    Result = False
+    If StrCount(Value, ".") = 3 Then
+        Dim S() As String
+        S = Split(Value, ".")
+        
+        If IsLong(S(0)) _
+        And IsLong(S(1)) _
+        And IsLong(S(2)) _
+        And IsLong(S(3)) Then
+            
+            Result = InRange(0, CLng(S(0)), 255) _
+                And InRange(0, CLng(S(1)), 255) _
+                And InRange(0, CLng(S(2)), 255) _
+                And InRange(0, CLng(S(3)), 255) _
+        
+        End If
+    End If
+    
+    IsIPAddress = Result
+End Function
 
 '----------------------------------------
-'・Microsoft Visual Basic for Applications Extensibility 5.3
+'・IPアドレス文字列をCurrency型にする
 '----------------------------------------
-Sub ReferenceAdd_VBAExtensibility(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Program Files\Common Files\microsoft shared\VBA\VBA6\VBE6EXT.OLB")
-End Sub
+Public Function IPAddressToCurrency( _
+ByVal IPAddressText As String) As Currency
+    Dim Result As Currency
+    Call Assert(IsIPAddress(IPAddressText), "Error:IPAddressToCurrency")
+    
+    Dim S() As String
+    S = Split(IPAddressText, ".")
+    
+    Result = _
+        CCur(LongToStrDigitZero(S(0), 3)) * 1000000000 + _
+        CCur(LongToStrDigitZero(S(1), 3)) * 1000000 + _
+        CCur(LongToStrDigitZero(S(2), 3)) * 1000 + _
+        CCur(LongToStrDigitZero(S(3), 3)) * 1
 
-Sub Run_ReferenceAdd_VBAExtensibility()
-    Call ReferenceAdd_VBAExtensibility(ThisWorkbook)
-End Sub
-
-'----------------------------------------
-'・Microsoft AxtiveX Data Objects 2.8 Library
-'----------------------------------------
-'   ・  ADODB.Streamを使用するのに必要
-'----------------------------------------
-Sub ReferenceAdd_ADO_2_8(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Program Files\Common Files\System\ado\msado28.tlb")
-End Sub
-
-Sub Run_ReferenceAdd_ADO_2_8()
-    Call ReferenceAdd_ADO_2_8(ThisWorkbook)
-End Sub
+    IPAddressToCurrency = Result
+End Function
 
 '----------------------------------------
-'・Microsoft AxtiveX Data Objects 6.1 Library
+'・IPアドレスが指定範囲内にあるかどうかを確認する
 '----------------------------------------
-'   ・  ADODB.Streamを使用するのに必要
-'----------------------------------------
-Sub ReferenceAdd_ADO_6_1(Book As Workbook)
-    Call Book.VBProject.References.AddFromFile( _
-        "C:\Program Files\Common Files\System\ado\msado15.dll")
-End Sub
+Public Function InRangeIPAddress( _
+ByVal MinValue As String, _
+ByVal Value As String, _
+ByVal MaxValue As String) As Boolean
 
-Sub Run_ReferenceAdd_ADO_6_1()
-    Call ReferenceAdd_ADO_6_1(ThisWorkbook)
-End Sub
-
+    InRangeIPAddress = _
+    ( _
+        (IPAddressToCurrency(MinValue) <= IPAddressToCurrency(Value)) _
+        And _
+        (IPAddressToCurrency(Value) <= IPAddressToCurrency(MaxValue)) _
+    )
+    
+End Function
 
 
 '--------------------------------------------------
@@ -7505,8 +8689,73 @@ End Sub
 '◇ ver 2017/02/05
 '・ FileCreateWaitをFileExistWaitに変更し
 '   ファイルの存在の有無を待つように機能追加
+'◇ ver 2017/02/11
+'・ Array2dRowsStartIndex/Array2dRowsEndIndex
+'   Array2dColumnsStartIndex/Array2dColumnsEndIndex 追加
+'・ Array2dRowsCount/Array2dColumnsCount 修正
+'・ Array2dSortCustomOrder
+'   Array2dSetRowValues/Array2dGetRowValues
+'   Array2dSetColumnValues/Array2dGetColumnValues
+'   1Originの配列(Indexの最小値が1の配列)に対応
+'◇ ver 2017/02/13
+'・ Application_StatusBar_Progress 修正
+'   ProgressText 追加
+'・ DeleteSheets 追加
+'・ SheetRangeSortCustomOrder 追加
+'◇ ver 2017/02/17
+'・ WorksheetExistsのBook指定の不具合修正
+'◇ ver 2017/02/20
+'・ CellValueIncrement 追加
+'・ WorkbookFullPath 追加
+'◇ ver 2017/02/26
+'・ IPアドレスを処理するために
+'   InRangeCurrency/IPAddressToCurrency
+'   /InRangeIPAddress/IsIPAddress 追加
+'・ ProgressText 修正
+'・ st_vba_WaitForm の組み込み
+'・ Standard Software URL Facebookページに変更
+'◇ ver 2017/03/06
+'・ SheetRangeSortCustomOrder に WorksheetFunction.Transpose の
+'   限界値がある不具合があり、Transpose関数と同じものを
+'   自作の Array2dTranspose 関数に置き換えた
+'◇ ver 2017/03/09
+'・ テキストファイル読み書き関数のエンコードのEnumでの指定版を作成
+'   GetEncodingTypeJpCharCode/GetEncodingTypeName
+'   /String_LoadFromFile/String_SaveToFile 追加
+'◇ ver 2017/03/12
+'・ TagInnerText 修正
+'◇ ver 2017/03/14
+'・ 参照設定追加コードを st_vba_SetReference に分離
+'◇ ver 2017/03/19
+'・ st_vba_SetReference の処理順序入れ替え
+'・ 各モジュールやクラスの説明がないものは先頭に説明を記載
+'・ st_vba_CSheetData_Sample を追加
+'◇ ver 2017/03/21
+'・ AbsolutePath のテストを追加
+'・ ForceCreateFolderを修正
+'・ 全体的に関数名をリファクタリング
+'   App_ / Book_ / Sheet_ / Range_ を関数先頭に追加
+'・ Sheet_ColumnNumberByTitle / Sheet_RowNumberByTitle を
+'   ワイルドカード対応
+'・ App_GetOpenedBookOrOpenBook 追加
+'・ Folder_DeleteIfNoFile / Folder_DeleteIfNoFileToUpFolder 追加
+'・ Format_Date_UseOnlyYMDHNS 追加
+'◇ ver 2017/03/23
+'・ RandomValue を追加
+'◇ ver 2017/03/25
+'・ IsDrivePath / IsNetworkPath の不具合を修正
+'・ AbsolutePathのネットワークパス対応
+'   テストの確立
+'・ Book_SaveAs の追加
+'・ FileDialog_FilePicker / FileDialog_Open
+'   / FileDialog_SaveAs / FileDialog_FolderPicker 追加
+'◇ ver 2017/04/01
+'・ st_vba_CSetting 追加
+'・ AbsolutePathを修正
+'・ String_GetOutShiftJIS
+'   /String_GetMachineDependentCharacter 追加
+'◇ ver 2017/04/02
+'・ TagInnerTextLast 追加
+'・ Folder_HasSubItem / Folder_DeleteSubItem 追加
+'・ Folder_DeleteIfNoFile 修正
 '--------------------------------------------------
-
-
-
-
