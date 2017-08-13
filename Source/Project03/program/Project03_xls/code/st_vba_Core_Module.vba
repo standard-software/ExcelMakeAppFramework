@@ -1284,14 +1284,14 @@ End Function
 '----------------------------------------
 'ÅEFirst
 '----------------------------------------
-Public Function IsFirstStr(ByVal Str As String, ByVal SubStr As String) As Boolean
+Public Function IsFirstStr(ByVal str As String, ByVal SubStr As String) As Boolean
     Dim Result As Boolean: Result = False
     Do
         If SubStr = "" Then Exit Do
-        If Str = "" Then Exit Do
-        If Len(Str) < Len(SubStr) Then Exit Do
+        If str = "" Then Exit Do
+        If Len(str) < Len(SubStr) Then Exit Do
 
-        If InStr(1, Str, SubStr) = 1 Then
+        If InStr(1, str, SubStr) = 1 Then
             Result = True
         End If
     Loop While False
@@ -1308,11 +1308,11 @@ Private Sub testIsFirstStr()
     Call Check(False, IsFirstStr("123", "1234"))
 End Sub
 
-Public Function IncludeFirstStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsFirstStr(Str, SubStr) Then
-        IncludeFirstStr = Str
+Public Function IncludeFirstStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsFirstStr(str, SubStr) Then
+        IncludeFirstStr = str
     Else
-        IncludeFirstStr = SubStr + Str
+        IncludeFirstStr = SubStr + str
     End If
 End Function
 
@@ -1323,11 +1323,11 @@ Private Sub testIncludeFirstStr()
     Call Check("2312345", IncludeFirstStr("12345", "23"))
 End Sub
 
-Public Function ExcludeFirstStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsFirstStr(Str, SubStr) Then
-        ExcludeFirstStr = Mid$(Str, Len(SubStr) + 1)
+Public Function ExcludeFirstStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsFirstStr(str, SubStr) Then
+        ExcludeFirstStr = Mid$(str, Len(SubStr) + 1)
     Else
-        ExcludeFirstStr = Str
+        ExcludeFirstStr = str
     End If
 End Function
 
@@ -1341,14 +1341,14 @@ End Sub
 '----------------------------------------
 'ÅELast
 '----------------------------------------
-Public Function IsLastStr(ByVal Str As String, ByVal SubStr As String) As Boolean
+Public Function IsLastStr(ByVal str As String, ByVal SubStr As String) As Boolean
     Dim Result As Boolean: Result = False
     Do
         If SubStr = "" Then Exit Do
-        If Str = "" Then Exit Do
-        If Len(Str) < Len(SubStr) Then Exit Do
+        If str = "" Then Exit Do
+        If Len(str) < Len(SubStr) Then Exit Do
 
-        If Mid$(Str, Len(Str) - Len(SubStr) + 1) = SubStr Then
+        If Mid$(str, Len(str) - Len(SubStr) + 1) = SubStr Then
             Result = True
         End If
     Loop While False
@@ -1365,11 +1365,11 @@ Private Sub testIsLastStr()
     Call Check(False, IsLastStr("123", "1234"))
 End Sub
 
-Public Function IncludeLastStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsLastStr(Str, SubStr) Then
-        IncludeLastStr = Str
+Public Function IncludeLastStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsLastStr(str, SubStr) Then
+        IncludeLastStr = str
     Else
-        IncludeLastStr = Str + SubStr
+        IncludeLastStr = str + SubStr
     End If
 End Function
 
@@ -1380,11 +1380,11 @@ Private Sub testIncludeLastStr()
     Call Check("1234534", IncludeLastStr("12345", "34"))
 End Sub
 
-Public Function ExcludeLastStr(ByVal Str As String, ByVal SubStr As String) As String
-    If IsLastStr(Str, SubStr) Then
-        ExcludeLastStr = Mid$(Str, 1, Len(Str) - Len(SubStr))
+Public Function ExcludeLastStr(ByVal str As String, ByVal SubStr As String) As String
+    If IsLastStr(str, SubStr) Then
+        ExcludeLastStr = Mid$(str, 1, Len(str) - Len(SubStr))
     Else
-        ExcludeLastStr = Str
+        ExcludeLastStr = str
     End If
 End Function
 
@@ -1398,14 +1398,14 @@ End Sub
 '----------------------------------------
 'ÅEBoth
 '----------------------------------------
-Public Function IncludeBothEndsStr(ByVal Str As String, ByVal SubStr As String) As String
+Public Function IncludeBothEndsStr(ByVal str As String, ByVal SubStr As String) As String
     IncludeBothEndsStr = _
-        IncludeFirstStr(IncludeLastStr(Str, SubStr), SubStr)
+        IncludeFirstStr(IncludeLastStr(str, SubStr), SubStr)
 End Function
 
-Public Function ExcludeBothEndsStr(ByVal Str As String, ByVal SubStr As String) As String
+Public Function ExcludeBothEndsStr(ByVal str As String, ByVal SubStr As String) As String
     ExcludeBothEndsStr = _
-        ExcludeFirstStr(ExcludeLastStr(Str, SubStr), SubStr)
+        ExcludeFirstStr(ExcludeLastStr(str, SubStr), SubStr)
 End Function
 
 
