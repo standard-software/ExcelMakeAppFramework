@@ -4,7 +4,7 @@
 'ModuleName:    Main Form
 'ObjectName:    FormMain
 '--------------------------------------------------
-'Version:       2015/07/29
+'Version:       2020/04/11
 '--------------------------------------------------
 Option Explicit
 
@@ -118,8 +118,8 @@ Private Sub UserForm_Activate()
         '------------------------------
         Call FAnchorMenuButton.Initialize( _
             Me.FrameMenuButton, _
-            HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 0, 0), _
-            VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
+            HorizonAnchorType.haRight, 2, _
+            VerticalAnchorType.vaTop, 0)
         'Excel2016では、Offset値はResizeFrameにかかわらず0になる
         'Excel2013では下記のコードが有効
         'Call FAnchorMenuButton.Initialize( _
