@@ -82,6 +82,13 @@ Project03.vbs
 
 を起動すると、3タイプのアプリケーションが起動します。
 
+■説明書
+
+以前のバージョン用ですが、画像を添付した説明書を記載しています。
+
+Excel MakeApp Framework
+https://www.facebook.com/notes/standard-software/excel-makeapp-framework/947983475303442
+
 
 ■導入支援など
 導入は簡単なものですが
