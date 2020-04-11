@@ -3,7 +3,7 @@ Excel MakeApp Framework
 Readme_jp.txt
 --------------------------------------------------
 スタンダードソフトウェア
-2015/07/24
+2020/04/11
 --------------------------------------------------
 standard-software/ExcelMakeAppFramework
 https://github.com/standard-software/ExcelMakeAppFramework
@@ -32,8 +32,7 @@ FormやExcelシートをウィンドウとして動作するようにしたものが
 
 Excel MakeApp Framework です。
 
-オープンソースのライブラリとして
-スタンダードソフトウェアのライブラリとして公開させていただきます。
+オープンソースのライブラリとして公開します。
 
 スタンダードソフトウェアでは
 ソースコードライブラリをオープンソースで提供し
@@ -44,16 +43,14 @@ Excel MakeApp Framework です。
 MIT ライセンスとします。
 
 ■対応
-Excel MakeApp Framework は次の Excel に対応しています。
-・  Excel 2010 32bit for Windows
-・  Excel 2013 32bit for Windows
-・  Excel 2013 64bit for Windows
+Excel MakeApp Framework は次の Excel で動作確認しています。
+・  Excel 2016 64bit for Windows
 
-おそらく、Excel 2010 64bit for Windows にも対応していますが
-動作確認できていないので、記載していません。
+Excel2010 や Excel2013 や Excel2019
+また、それぞれの 64bit版 32bit版 でも全て動くと思いますが
+手元に環境がないの動作確認はできていません。
 
-また、Excel for Mac には対応していません。
-
+Excel for Mac には対応していません。
 
 ■使用方法
 
@@ -69,8 +66,6 @@ Excel MakeApp Framework は次の Excel に対応しています。
                 Project01.ini --- アプリケーション設定Iniファイル
                 Project01.vbs --- アプリケーション起動ファイル
                 program 
-                    tool
-                        Win7AppId.exe_ --- タスクバー登録用実行ファイル
                     FormMainIcon.ico --- アプリケーションアイコンファイル
                     Project01.xls --- アプリケーション本体Excelファイル
 
@@ -80,16 +75,6 @@ Excel MakeApp Framework は次の Excel に対応しています。
             Project03
                 Project01と構成同じ
 
-
-Win7AppId.exe_ は 拡張子を .exe_ から .exe に変更してください。
-
-Win7AppId.exe は、次のサイトのものを使わせていただいています。
-
-win7appid - Windows 7 Shortcut Application Id Tool - Google Project Hosting
-https://code.google.com/p/win7appid/
-
-タスクバー登録時にどうしても Excel VBA だけで行えないコマンド的な処理があり
-そこをこのプログラムで補っています。
 
 Project01.vbs
 Project02.vbs
@@ -111,8 +96,7 @@ standard.software.net@gmail.com
 有料にて応相談とさせてください。
 
 ■ライセンス
-このプログラムソースコードのオープンソースライセンスは
-MIT ライセンスです。
+このプログラムのソースコードのライセンスは MIT ライセンスです。
 
 このプログラムを使用の際に、MIT ライセンスに準拠して
 オープンソースとして使用することができます。
