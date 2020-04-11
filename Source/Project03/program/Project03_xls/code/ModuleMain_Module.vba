@@ -4,7 +4,7 @@
 'ModuleName:    Main Module
 'ObjectName:    ModuleMain
 '--------------------------------------------------
-'Version:       2015/07/29
+'Version:       2020/04/11
 '--------------------------------------------------
 Option Explicit
 
@@ -12,15 +12,10 @@ Option Explicit
 '■Main
 '--------------------------------------------------
 Sub testMain()
-    Select Case 1
-    Case 1
-        Call Main("")
-    Case 2
-        Call Main("Hello" + vbTab + "World")
-    End Select
+    Call Main
 End Sub
 
-Sub Main(ByVal ArgsText As String)
+Sub Main(Optional ByVal ArgsText As String = "")
 On Error GoTo Err:
 
     Call SetCurrentProcessExplicitAppUserModelID( _
@@ -52,14 +47,6 @@ On Error GoTo Err:
     Call SetWindowIcon(Application.hWnd, _
         Project_MainIconFilePath, Project_MainIconIndex)
 
-
-    Dim ArgsArray() As String
-    ArgsArray = Split(ArgsText, vbTab)
-    Dim I As Long
-    For I = 0 To ArrayCount(ArgsArray) - 1
-        Call MsgBox(ArgsArray(I))
-    Next
-    
     Exit Sub
 Err:
     Call MsgBox( _
@@ -98,18 +85,6 @@ Function Project_MainIconFilePath() As String
         Project_ProgramFolderName, _
         Project_MainIconFileName)
 End Function
-
-'----------------------------------------
-'◆コマンドファイルパス
-'----------------------------------------
-Function Project_TaskbarPinCommandExeFilePath() As String
-    Project_TaskbarPinCommandExeFilePath = PathCombine( _
-        Project_MainFolderPath, _
-        Project_ProgramFolderName, _
-        "tool", _
-        "Win7AppId.exe")
-End Function
-
 
 '----------------------------------------
 '◆ショートカットファイルパス
