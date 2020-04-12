@@ -18,7 +18,7 @@ Public Args As String
 
 Private FormProperty As New st_vba_FormProperty
 
-Private FAnchorMenuButton As New st_vba_ControlAnchor
+Private AnchorMenuButton As New st_vba_ControlAnchor
 
 '----------------------------------------
 '◆ユーザー用
@@ -108,24 +108,18 @@ Private Sub UserForm_Activate()
         '------------------------------
         '◇メニューボタンを右上端にする
         '------------------------------
-        Me.FrameMenuButton.Top = 0
-        Me.FrameMenuButton.Left = _
-            Me.FrameMenuButton.Parent.InsideWidth - _
-            Me.FrameMenuButton.Width + 1
+        Me.ImageMenuButton.Top = 0
+        Me.ImageMenuButton.Left = _
+            Me.ImageMenuButton.Parent.InsideWidth - _
+            Me.ImageMenuButton.Width + 1
 
         '------------------------------
         '◇フレームワークアンカー初期化処理
         '------------------------------
-        Call FAnchorMenuButton.Initialize( _
-            Me.FrameMenuButton, _
+        Call AnchorMenuButton.Initialize( _
+            Me.ImageMenuButton, _
             HorizonAnchorType.haRight, 2, _
             VerticalAnchorType.vaTop, 0)
-        'Excel2016では、Offset値はResizeFrameにかかわらず0になる
-        'Excel2013では下記のコードが有効
-        'Call FAnchorMenuButton.Initialize( _
-        '   Me.FrameMenuButton, _
-        '   HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
-        '   VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
 
         '------------------------------
         '◇ユーザー用アンカー初期化処理
@@ -237,7 +231,7 @@ Private Sub UserForm_Resize()
         '------------------------------
         '◇フレームワークアンカーレイアウト処理
         '------------------------------
-        Call FAnchorMenuButton.Layout
+        Call AnchorMenuButton.Layout
 
         '------------------------------
         '◇ユーザー用アンカーレイアウト処理
@@ -295,10 +289,10 @@ Private Sub ImageMenuButton_Click()
     YOffsetResizeOff = YOffsetResizeOff * (GetDPI / 96)
 
     Select Case PopupMenu_PopupReturn(PopupMenu, _
-        PointToPixel(Me.Left + FrameMenuButton.Left + FrameMenuButton.Width) _
+        PointToPixel(Me.Left + ImageMenuButton.Left + ImageMenuButton.Width) _
         + IIf(FormProperty.ResizeFrame, XOffsetResizeOn, XOffsetResizeOff) _
         - PopupMenu.Width + XOffset, _
-        PointToPixel(Me.Top + FrameMenuButton.Top + FrameMenuButton.Height) _
+        PointToPixel(Me.Top + ImageMenuButton.Top + ImageMenuButton.Height) _
         + IIf(FormProperty.ResizeFrame, YOffsetResizeOn, YOffsetResizeOff) _
         + IIf(FormProperty.TitleBar, YOffsetTitleBarOn, YOffsetTitleBarOff))
     Case "CreateAppShortcut"

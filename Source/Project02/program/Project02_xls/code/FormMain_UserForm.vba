@@ -18,7 +18,7 @@ Public Args As String
 
 Private FormProperty As New st_vba_FormProperty
 
-Private FAnchorMenuButton As New st_vba_ControlAnchor
+Private AnchorMenuButton As New st_vba_ControlAnchor
 
 '----------------------------------------
 '◆ユーザー用
@@ -26,14 +26,14 @@ Private FAnchorMenuButton As New st_vba_ControlAnchor
 '------------------------------
 '◇アンカー定義
 '------------------------------
-Private FAnchorLeftTextBox As New st_vba_ControlAnchor
-Private FAnchorTopTextBox As New st_vba_ControlAnchor
-Private FAnchorBottomTextBox As New st_vba_ControlAnchor
-Private FAnchorSplitter1 As New st_vba_ControlAnchor
-Private FAnchorSplitter2 As New st_vba_ControlAnchor
+Private AnchorLeftTextBox As New st_vba_ControlAnchor
+Private AnchorTopTextBox As New st_vba_ControlAnchor
+Private AnchorBottomTextBox As New st_vba_ControlAnchor
+Private AnchorSplitter1 As New st_vba_ControlAnchor
+Private AnchorSplitter2 As New st_vba_ControlAnchor
 
-Private FSplitter1 As New st_vba_ControlSplitter
-Private FSplitter2 As New st_vba_ControlSplitter
+Private Splitter1 As New st_vba_ControlSplitter
+Private Splitter2 As New st_vba_ControlSplitter
 '------------------------------
 '◇変数定義
 '------------------------------
@@ -116,66 +116,60 @@ Private Sub UserForm_Activate()
         '------------------------------
         '◇メニューボタンを右上端にする
         '------------------------------
-        Me.FrameMenuButton.Top = 0
-        Me.FrameMenuButton.Left = _
-            Me.FrameMenuButton.Parent.InsideWidth - _
-            Me.FrameMenuButton.Width + 1
+        Me.ImageMenuButton.Top = 0
+        Me.ImageMenuButton.Left = _
+            Me.ImageMenuButton.Parent.InsideWidth - _
+            Me.ImageMenuButton.Width + 1
 
         '------------------------------
         '◇フレームワークアンカー初期化処理
         '------------------------------
-        Call FAnchorMenuButton.Initialize( _
-            Me.FrameMenuButton, _
+        Call AnchorMenuButton.Initialize( _
+            Me.ImageMenuButton, _
             HorizonAnchorType.haRight, 2, _
             VerticalAnchorType.vaTop, 0)
-        'Excel2016では、Offset値はResizeFrameにかかわらず0になる
-        'Excel2013では下記のコードが有効
-        'Call FAnchorMenuButton.Initialize( _
-        '   Me.FrameMenuButton, _
-        '   HorizonAnchorType.haRight, IIf(FormProperty.ResizeFrame, 8, 0), _
-        '   VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 8, 0))
 
         '------------------------------
         '◇ユーザー用アンカー初期化処理
         '------------------------------
         '以下にユーザー独自のアンカー初期化処理を記述してください
         '------------------------------
-        Call FAnchorLeftTextBox.Initialize( _
+        Call AnchorLeftTextBox.Initialize( _
             Me.TextBoxLeft, _
             HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 0, 0), _
             VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
-        Call FAnchorTopTextBox.Initialize( _
+        Call AnchorTopTextBox.Initialize( _
             Me.TextBoxTop, _
             HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
             VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
-        Call FAnchorBottomTextBox.Initialize( _
+        Call AnchorBottomTextBox.Initialize( _
             Me.TextBoxBottom, _
             HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
             VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
-        Call FAnchorSplitter1.Initialize( _
+        Call AnchorSplitter1.Initialize( _
             Me.ImageSplitter1, _
             HorizonAnchorType.haLeft, IIf(FormProperty.ResizeFrame, 0, 0), _
             VerticalAnchorType.vaStretch, IIf(FormProperty.ResizeFrame, 0, 0))
-        Call FAnchorSplitter2.Initialize( _
+        Call AnchorSplitter2.Initialize( _
             Me.ImageSplitter2, _
             HorizonAnchorType.haStretch, IIf(FormProperty.ResizeFrame, 0, 0), _
             VerticalAnchorType.vaTop, IIf(FormProperty.ResizeFrame, 0, 0))
 
-        Call FSplitter1.Initialize( _
+        Call Splitter1.Initialize( _
             ImageSplitter1, _
             SplitterType.Vertical, _
             10, 10)
-        Call FSplitter1.AddControlLeftTop(TextBoxLeft)
-        Call FSplitter1.AddControlRightBottom(TextBoxTop)
-        Call FSplitter1.AddControlRightBottom(TextBoxBottom)
-        Call FSplitter1.AddControlRightBottom(ImageSplitter2)
+        Call Splitter1.AddControlLeftTop(TextBoxLeft)
+        Call Splitter1.AddControlRightBottom(TextBoxTop)
+        Call Splitter1.AddControlRightBottom(TextBoxBottom)
+        Call Splitter1.AddControlRightBottom(ImageSplitter2)
         
-        Call FSplitter2.Initialize( _
+        Call Splitter2.Initialize( _
             ImageSplitter2, _
             SplitterType.Horizon, _
             10, 10)
-        Call FSplitter2.AddControlLeftTop(TextBoxTop)
-        Call FSplitter2.AddControlRightBottom(TextBoxBottom)
+        Call Splitter2.AddControlLeftTop(TextBoxTop)
+        Call Splitter2.AddControlRightBottom(TextBoxBottom)
 
         Call IniRead_UserFormActivate
 
@@ -254,8 +248,8 @@ Public Sub IniRead_UserFormActivate()
         IniFile_GetString(Project_IniFilePath, _
             "Form", "Splitter1Left"), ImageSplitter1.Left)
             
-    If FSplitter1.CanLayoutUpdate(Splitter1Left, ImageSplitter1.Top) Then
-        Call FSplitter1.LayoutUpdate(Splitter1Left, ImageSplitter1.Top)
+    If Splitter1.CanLayoutUpdate(Splitter1Left, ImageSplitter1.Top) Then
+        Call Splitter1.LayoutUpdate(Splitter1Left, ImageSplitter1.Top)
     End If
     
     Dim Splitter2Top As Long
@@ -263,8 +257,8 @@ Public Sub IniRead_UserFormActivate()
         IniFile_GetString(Project_IniFilePath, _
             "Form", "Splitter2Top"), ImageSplitter2.Top)
             
-    If FSplitter2.CanLayoutUpdate(ImageSplitter2.Left, Splitter2Top) Then
-        Call FSplitter2.LayoutUpdate(ImageSplitter2.Left, Splitter2Top)
+    If Splitter2.CanLayoutUpdate(ImageSplitter2.Left, Splitter2Top) Then
+        Call Splitter2.LayoutUpdate(ImageSplitter2.Left, Splitter2Top)
     End If
 End Sub
 
@@ -302,18 +296,18 @@ Private Sub UserForm_Resize()
         '------------------------------
         '◇フレームワークアンカーレイアウト処理
         '------------------------------
-        Call FAnchorMenuButton.Layout
+        Call AnchorMenuButton.Layout
 
         '------------------------------
         '◇ユーザー用アンカーレイアウト処理
         '------------------------------
         '以下にユーザー独自のアンカーレイアウト処理を記述してください
         '------------------------------
-        Call FAnchorLeftTextBox.Layout
-        Call FAnchorTopTextBox.Layout
-        Call FAnchorBottomTextBox.Layout
-        Call FAnchorSplitter1.Layout
-        Call FAnchorSplitter2.Layout
+        Call AnchorLeftTextBox.Layout
+        Call AnchorTopTextBox.Layout
+        Call AnchorBottomTextBox.Layout
+        Call AnchorSplitter1.Layout
+        Call AnchorSplitter2.Layout
     End If
 End Sub
 
@@ -363,10 +357,10 @@ Private Sub ImageMenuButton_Click()
     YOffsetResizeOff = YOffsetResizeOff * (GetDPI / 96)
 
     Select Case PopupMenu_PopupReturn(PopupMenu, _
-        PointToPixel(Me.Left + FrameMenuButton.Left + FrameMenuButton.Width) _
+        PointToPixel(Me.Left + ImageMenuButton.Left + ImageMenuButton.Width) _
         + IIf(FormProperty.ResizeFrame, XOffsetResizeOn, XOffsetResizeOff) _
         - PopupMenu.Width + XOffset, _
-        PointToPixel(Me.Top + FrameMenuButton.Top + FrameMenuButton.Height) _
+        PointToPixel(Me.Top + ImageMenuButton.Top + ImageMenuButton.Height) _
         + IIf(FormProperty.ResizeFrame, YOffsetResizeOn, YOffsetResizeOff) _
         + IIf(FormProperty.TitleBar, YOffsetTitleBarOn, YOffsetTitleBarOff))
     Case "CreateAppShortcut"
